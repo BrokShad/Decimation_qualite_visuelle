@@ -1,0 +1,1 @@
+# Decimation_qualite_visuelle

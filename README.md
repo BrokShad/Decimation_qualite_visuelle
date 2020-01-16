@@ -17,3 +17,8 @@ Simplification par mesur d'erreur quadratique
 http://hhoppe.com/newqem.pdf   
 H. Hoppe   
 Simplification par mesur de la ""métrique quadrique"   
+
+Differentes implémentations de simplification par mesur de l'erreur quadrique :   
+https://github.com/YuxingZhang/meshsimplification   
+https://github.com/ataber/mesh-simplify   
+https://github.com/sp4cerat/Fast-Quadric-Mesh-Simplification   

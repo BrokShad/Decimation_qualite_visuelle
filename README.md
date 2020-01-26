@@ -1,6 +1,6 @@
 # Decimation qualite visuelle
 
-Related work :
+**Related work :**
 
 https://hal.archives-ouvertes.fr/hal-02155733/document   
 Anass Nouri, Christophe Charrier, Olivier Lezoray   
@@ -22,3 +22,35 @@ Differentes implémentations de simplification par mesur de l'erreur quadrique :
 https://github.com/YuxingZhang/meshsimplification   
 https://github.com/ataber/mesh-simplify   
 https://github.com/sp4cerat/Fast-Quadric-Mesh-Simplification   
+
+**Resultats**  
+
+77 Remeshing Poisson :  
+ - Nombre de face : 294116
+ - Nombre sommets : 147061
+ - Score de qualité visuelle :  
+
+Statue Remeshing Poisson :  
+ - Nombre de face :  
+ - Nombre sommets :  
+ - Score de qualité visuelle :  
+ 
+77 Remeshing Poisson Decimation fast Quadric 0.5 :  
+ - Nombre de face :  
+ - Nombre sommets :  
+ - Score de qualité visuelle :  
+ 
+Statue Remeshing Poisson Decimation fast Quadric 0.5 :  
+ - Nombre de face :  
+ - Nombre sommets :  
+ - Score de qualité visuelle :  
+ 
+ 77 Remeshing Poisson Decimation Meshlab Quadric 0.1 Threshold 0.8 :  
+ - Nombre de face :  
+ - Nombre sommets :  
+ - Score de qualité visuelle :  
+ 
+ Statue Remeshing Poisson Decimation Meshlab Quadric 0.1 Threshold 0.2 :  
+ - Nombre de face :  
+ - Nombre sommets :  
+ - Score de qualité visuelle :  

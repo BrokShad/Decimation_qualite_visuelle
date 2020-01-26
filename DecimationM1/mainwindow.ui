@@ -269,6 +269,11 @@ C3 :</string>
                </item>
                <item>
                 <property name="text">
+                 <string>Erreur quadrique</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
                  <string>Par taille</string>
                 </property>
                </item>

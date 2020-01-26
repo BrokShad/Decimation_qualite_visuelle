@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "../Fast-Quadric-Mesh-Simplification-master/src.cmd/Simplify.h"
 //TP4
 /* **** début de la partie à compléter **** */
 void MainWindow::showEdgeSelection(MyMesh* _mesh)
@@ -287,6 +288,33 @@ void MainWindow::decimation(MyMesh* _mesh, int percent, QString method)
         while(_mesh->n_edges() > finalEgdeCount){
             collapseEdge(_mesh, getSmallestEdgeFace(_mesh));
         }
+    } else if (method == "Erreur quadrique"){
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
+
+        Simplify::load_obj(fileName.toStdString().c_str());
+        double agressiveness = 7.0;
+        printf("Mesh Simplification (C)2014 by Sven Forstmann in 2014, MIT License (%zu-bit)\n", sizeof(size_t)*8);
+        Simplify::load_obj(fileName.toStdString().c_str());
+        if ((Simplify::triangles.size() < 3) || (Simplify::vertices.size() < 3))
+            printf("Error");
+        int target_count =  Simplify::triangles.size() >> 1;
+        target_count = round((float)Simplify::triangles.size() * 0.10);
+        if (target_count < 4) {
+            printf("Object will not survive such extreme decimation\n");
+        }
+        clock_t start = clock();
+        printf("Input: %zu vertices, %zu triangles (target %d)\n", Simplify::vertices.size(), Simplify::triangles.size(), target_count);
+        int startSize = Simplify::triangles.size();
+        Simplify::simplify_mesh(target_count, agressiveness, true);
+        //Simplify::simplify_mesh_lossless( false);
+        if ( Simplify::triangles.size() >= startSize) {
+            printf("Unable to reduce mesh.\n");
+        }
+        Simplify::write_obj("quadric.obj");
+        printf("Output: %zu vertices, %zu triangles (%f reduction; %.4f sec)\n",Simplify::vertices.size(), Simplify::triangles.size()
+            , (float)Simplify::triangles.size()/ (float) startSize  , ((float)(clock()-start))/CLOCKS_PER_SEC );
+
+        qDebug() << "Nombre face : " << Simplify::triangles.size();;
     }
     else {
         qDebug() << "Méthode inconnue !!!";

@@ -7,6 +7,9 @@
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 #include <QProgressDialog>
 #include <cstdlib>
+#include <QVector>
+#include <math.h>
+
 namespace Ui {
 class MainWindow;
 }
@@ -55,6 +58,16 @@ public:
     float getAngleFF(MyMesh *_mesh, int faceID0, int faceID1);
     int getSmallestEdge(MyMesh *_mesh);
     int getSmallestEdgeFace(MyMesh *_mesh);
+
+    float barycentricArea(MyMesh *_mesh, int vertexID);
+    float angleEE(MyMesh *_mesh, int vertexID, int faceID);
+    float angleFF(MyMesh *_mesh, int faceID0, int faceID1, int vertID0, int vertID1);
+    float calculateCurveOnVertex(MyMesh *_mesh, int vertexID);
+    void H_Curv(MyMesh *_mesh);
+    void GWAMC(MyMesh *_mesh, float delta, QVector<MyMesh::Point> N, VertexHandle X);
+
+    float *Curvature;
+    void saliency(MyMesh *_mesh, float delta);
 private slots:
 
     void on_pushButton_chargement_clicked();
@@ -63,6 +76,8 @@ private slots:
     void on_pushButton_delSelEdge_clicked();
 
     void on_pushButton_decimate_clicked();
+
+    void on_pushButton_clicked();
 
 private:
 

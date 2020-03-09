@@ -1,8 +1,174 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "../Fast-Quadric-Mesh-Simplification-master/src.cmd/Simplify.h"
+#include <iostream>
 //TP4
 /* **** début de la partie à compléter **** */
+
+using namespace std;
+
+void MainWindow::H_Curv(MyMesh* _mesh)
+{
+    Curvature = new float[_mesh->n_vertices()];
+
+    // courbure moyenne
+    for (MyMesh::VertexIter curVert = _mesh->vertices_begin(); curVert != _mesh->vertices_end(); curVert++) {
+        float aire_barycentrique = barycentricArea(_mesh, (*curVert).idx());
+        float H = calculateCurveOnVertex(_mesh, (*curVert).idx()) / (4 * aire_barycentrique);
+        _mesh->data(*curVert).value = H;
+        Curvature[(*curVert).idx()] = H;
+    }
+}
+
+void MainWindow::GWAMC(MyMesh* _mesh, float delta, QVector<MyMesh::Point> N, VertexHandle X){
+    float GWA[_mesh->n_vertices()];
+    int id = X.idx();
+    MyMesh::Point Xp = _mesh->point(_mesh->vertex_handle(id));
+    float top = 0;
+    float bot = 0;
+    for (int i = 0; i < N.size(); ++i) {
+        top += Curvature[id] * exp ((norm(Xp-N.at(i))*norm(Xp-N.at(i)))/2*delta*delta);
+        bot += exp ((norm(Xp-N.at(i))*norm(Xp-N.at(i)))/2*delta*delta);
+    }
+    GWA[id] = top*bot;
+}
+
+void MainWindow::saliency(MyMesh* _mesh, float delta){
+    for(int i = 0; i < _mesh->n_vertices(); i ++){
+
+    }
+}
+
+float MainWindow::calculateCurveOnVertex(MyMesh* _mesh, int vertexID)
+{
+    VertexHandle vertex = VertexHandle(vertexID);
+    float sum = 0.0;
+
+    // on stocke toutes les faces adjacentes au sommet
+    std::vector<int> faces;
+    for(MyMesh::VertexFaceCWIter vfit = _mesh->vf_cwiter(vertex); vfit.is_valid(); vfit++){
+        faces.push_back((*vfit).idx());
+    }
+
+    for(int i = 0; i < faces.size(); i++) {
+        // on compare toutes les paires de face
+        int face0 = faces[i];
+        int face1 = faces[(i+1) % faces.size()];
+
+        // on cherche l'arête commune entre les deux faces
+        int edgeCommune;
+        for(MyMesh::FaceEdgeIter feit0 = _mesh->fe_iter(FaceHandle(face0)); feit0.is_valid(); feit0++) {
+            for(MyMesh::FaceEdgeIter feit1 = _mesh->fe_iter(FaceHandle(face1)); feit1.is_valid(); feit1++) {
+                if((*feit0).idx() == (*feit1).idx()) {
+                    edgeCommune = (*feit0).idx();
+                    break;
+                }
+            }
+        }
+
+        // on cherche le sommet opposé sur la même arête
+        int vertexOppose;
+        for(MyMesh::VertexVertexIter vvit = _mesh->vv_iter(vertex); vvit.is_valid(); vvit++) {
+            for(MyMesh::VertexEdgeIter veit = _mesh->ve_iter(vvit); veit.is_valid(); veit++) {
+                if((*veit).idx() == edgeCommune) {
+                    vertexOppose = (*vvit).idx();
+                    break;
+                }
+            }
+        }
+
+        // on a tout trouvé, on ajoute l'angle entre les deux faces que multiplie
+        // la longueur de l'arête commune
+        sum += (angleFF(_mesh, face0, face1, vertexID, vertexOppose) * _mesh->calc_edge_length(EdgeHandle(edgeCommune)));
+    }
+
+    return sum;
+}
+
+float MainWindow::angleFF(MyMesh* _mesh, int faceID0,  int faceID1, int vertID0, int vertID1)
+{
+    // calcul des normales des faces que l'on normalise
+    FaceHandle fh1 = _mesh->face_handle(faceID0);
+    FaceHandle fh2 = _mesh->face_handle(faceID1);
+    MyMesh::Normal normal1 = _mesh->calc_face_normal(fh1);
+    MyMesh::Normal normal2 = _mesh->calc_face_normal(fh2);
+    normal1.normalize();
+    normal2.normalize();
+
+    MyMesh::Point point1, point2;
+    point1 = _mesh->point(_mesh->vertex_handle(vertID0));
+    point2 = _mesh->point(_mesh->vertex_handle(vertID1));
+
+    // calcul du vecteur entre point 1 et 2
+    MyMesh::Normal vector_v1_v2 = point2 - point1;
+
+    // calcul de l'angle entre les deux normales des faces 1 et 2
+    float angle = acos(dot(normal1, normal2));
+
+    //qDebug() << "(" << faceID0 << ", " << faceID1 << ", " << vertID0 << ", " << vertID1 << ") : " << angle * 180 / PI << endl;
+    //qDebug() << dot(cross_product, vector_v1_v2) << endl;
+
+    // determiner le signe de l'angle
+    MyMesh::Normal cross_product = cross(normal1, normal2);
+    return dot(cross_product, vector_v1_v2) < 0 ? - angle : angle;
+}
+
+float MainWindow::angleEE(MyMesh* _mesh, int vertexID, int faceID)
+{
+    FaceHandle face_h = _mesh->face_handle(faceID);
+    QVector<MyMesh::Point> points;
+    MyMesh::Point point_origine;
+
+    // on cherche le point d'origine
+    for(MyMesh::FaceVertexIter curVer = _mesh->fv_begin(face_h); curVer.is_valid(); curVer++) {
+        VertexHandle vertex_h = *curVer;
+
+        if(vertex_h.idx() == vertexID) {
+            point_origine = _mesh->point(vertex_h);
+        }
+        else {
+            points.push_back(_mesh->point(vertex_h));
+        }
+    }
+
+    MyMesh::Point vecteur1 = points[1] - point_origine;
+    MyMesh::Point vecteur2 = points[0] - point_origine;
+    vecteur1.normalize();
+    vecteur2.normalize();
+
+    return acos(dot(vecteur1, vecteur2));
+}
+
+float MainWindow::barycentricArea(MyMesh* _mesh, int vertexID) {
+    VertexHandle vh = _mesh->vertex_handle(vertexID);
+
+    float area = 0;
+    for(MyMesh::VertexFaceIter vfit = _mesh->vf_iter(vh); vfit.is_valid(); vfit++){
+        area += faceArea(_mesh,(*vfit).idx());
+    }
+
+    return area / 3;
+}
+
+float MainWindow::faceArea(MyMesh* _mesh, int faceID)
+{
+    FaceHandle face_h = FaceHandle(faceID);
+
+    // on enregistre les points de la face dans un QVector
+    QVector<MyMesh::Point> points;
+    for(MyMesh::FaceVertexIter curVer = _mesh->fv_iter(face_h); curVer.is_valid(); curVer++) {
+        VertexHandle vertex_h = *curVer;
+        points.push_back(_mesh->point(vertex_h));
+    }
+
+    return norm((points[1] - points[0]) % (points[2] - points[0])) / 2;
+}
+
+
+/************/
+/*  OLD TP  */
+/************/
+
+
 void MainWindow::showEdgeSelection(MyMesh* _mesh)
 {
     // on réinitialise les couleurs de tout le maillage
@@ -39,22 +205,6 @@ int MainWindow::getSmallestEdge(MyMesh* _mesh){
         }
     }
     return id_smallest;
-}
-
-//cette fonction est utilisé pour le deuxieme critere personnalisé (taille edge * air des deux faces adjacentes)
-float MainWindow::faceArea(MyMesh* _mesh, int faceID)
-{
-    //calcul de l'aire de la face "faceID"
-    FaceHandle face_h = FaceHandle(faceID);
-    QVector<MyMesh::Point> points;
-
-    //parcours de tous les sommets de la face courante
-    for(MyMesh::FaceVertexIter curVer = _mesh->fv_iter(face_h); curVer.is_valid(); curVer++) {
-        VertexHandle vertex_h = *curVer;
-        points.push_back(_mesh->point(vertex_h));
-    }
-
-    return norm((points[1] - points[0]) % (points[2] - points[0])) / 2;
 }
 
 int MainWindow::getSmallestEdgeFace(MyMesh* _mesh){
@@ -288,33 +438,6 @@ void MainWindow::decimation(MyMesh* _mesh, int percent, QString method)
         while(_mesh->n_edges() > finalEgdeCount){
             collapseEdge(_mesh, getSmallestEdgeFace(_mesh));
         }
-    } else if (method == "Erreur quadrique"){
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
-
-        Simplify::load_obj(fileName.toStdString().c_str());
-        double agressiveness = 7.0;
-        printf("Mesh Simplification (C)2014 by Sven Forstmann in 2014, MIT License (%zu-bit)\n", sizeof(size_t)*8);
-        Simplify::load_obj(fileName.toStdString().c_str());
-        if ((Simplify::triangles.size() < 3) || (Simplify::vertices.size() < 3))
-            printf("Error");
-        int target_count =  Simplify::triangles.size() >> 1;
-        target_count = round((float)Simplify::triangles.size() * 0.10);
-        if (target_count < 4) {
-            printf("Object will not survive such extreme decimation\n");
-        }
-        clock_t start = clock();
-        printf("Input: %zu vertices, %zu triangles (target %d)\n", Simplify::vertices.size(), Simplify::triangles.size(), target_count);
-        int startSize = Simplify::triangles.size();
-        Simplify::simplify_mesh(target_count, agressiveness, true);
-        //Simplify::simplify_mesh_lossless( false);
-        if ( Simplify::triangles.size() >= startSize) {
-            printf("Unable to reduce mesh.\n");
-        }
-        Simplify::write_obj("quadric.obj");
-        printf("Output: %zu vertices, %zu triangles (%f reduction; %.4f sec)\n",Simplify::vertices.size(), Simplify::triangles.size()
-            , (float)Simplify::triangles.size()/ (float) startSize  , ((float)(clock()-start))/CLOCKS_PER_SEC );
-
-        qDebug() << "Nombre face : " << Simplify::triangles.size();;
     }
     else {
         qDebug() << "Méthode inconnue !!!";
@@ -612,4 +735,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    H_Curv(&mesh);
+    displayMesh(&mesh);
 }

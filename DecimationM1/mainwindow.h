@@ -10,12 +10,24 @@
 #include <QVector>
 #include <math.h>
 
+#include <stdlib.h>
+#include <list>
+#include <vector>
+#include <iterator>
+#include <iostream>
+#include <algorithm>
+#include <math.h>
+#include <time.h>
+#include <cmath>
+
 namespace Ui {
 class MainWindow;
 }
 
 using namespace OpenMesh;
 using namespace OpenMesh::Attributes;
+
+using namespace std;
 
 struct MyTraits : public OpenMesh::DefaultTraits
 {
@@ -64,10 +76,13 @@ public:
     float angleFF(MyMesh *_mesh, int faceID0, int faceID1, int vertID0, int vertID1);
     float calculateCurveOnVertex(MyMesh *_mesh, int vertexID);
     void H_Curv(MyMesh *_mesh);
-    void GWAMC(MyMesh *_mesh, float delta, QVector<MyMesh::Point> N, VertexHandle X);
+    float GWAMC(MyMesh *_mesh, float delta, QVector<MyMesh::Point> N, VertexHandle X);
 
     float *Curvature;
-    void saliency(MyMesh *_mesh, float delta);
+    void saliency(MyMesh *_mesh);
+    void initData(MyMesh *_mesh);
+    void Neighbourhood(MyMesh *_mesh);
+    QVector<MyMesh::Point> rangeSearch(MyMesh *_mesh, int pid, float range);
 private slots:
 
     void on_pushButton_chargement_clicked();
@@ -79,7 +94,34 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_pushButton_2_clicked();
+
 private:
+
+    struct Point
+    {
+        int id;
+        float x;
+        float y;
+        float z;
+    };
+
+    float Xmax;
+    float Xmin;
+    float Ymax;
+    float Ymin;
+    float Zmax;
+    float Zmin;
+    float cellSizex;
+    float cellSizey;
+    float cellSizez;
+    float diagBoundBox;
+
+    QVector<MyMesh::Point> pList;
+    QList<MyMesh::Point> ***cluster;
+
+    int TAB_SIZE = 120;
+    int POINTS_POOL = 1200000;
 
     bool modevoisinage;
 

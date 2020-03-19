@@ -12,34 +12,47 @@ void MainWindow::initData(MyMesh *_mesh)
 {
     //Génération de l'espace de clusters
     cout << "Attribution..." << endl;
-    cluster = new QList<MyMesh::Point>**[TAB_SIZE];
-    for(int i=0; i<TAB_SIZE; i++)
-    {
-//        cout << i << "/" << TAB_SIZE << endl;
-        cluster[i] = new QList<MyMesh::Point>*[TAB_SIZE];
-        for(int j=0; j<TAB_SIZE; j++)
-        {
-            cluster[i][j] = new QList<MyMesh::Point>[TAB_SIZE];
-        }
-    }
-
+//    cluster = new QList<MyMesh::Point>**[TAB_SIZE];
+//    for(int i=0; i<TAB_SIZE; i++)
+//    {
+////        cout << i << "/" << TAB_SIZE << endl;
+//        cluster[i] = new QList<MyMesh::Point>*[TAB_SIZE];
+//        for(int j=0; j<TAB_SIZE; j++)
+//        {
+//            cluster[i][j] = new QList<MyMesh::Point>[TAB_SIZE];
+//        }
+//    }
 
     for (MyMesh::VertexIter vit = _mesh->vertices_begin(); vit != _mesh->vertices_end(); ++vit)
     {
-        if(_mesh->point(*vit)[0] > Xmax) Xmax = _mesh->point(*vit)[0];
-        else if(_mesh->point(*vit)[0] < Xmin) Xmin = _mesh->point(*vit)[0];
+        if(vit == _mesh->vertices_begin())
+        {
+            Xmax = _mesh->point(*vit)[0];
+            Ymax = _mesh->point(*vit)[1];
+            Zmax = _mesh->point(*vit)[2];
+            Xmin = _mesh->point(*vit)[0];
+            Ymin = _mesh->point(*vit)[1];
+            Zmin = _mesh->point(*vit)[2];
+        }
+        else
+        {
+            if(_mesh->point(*vit)[0] > Xmax) Xmax = _mesh->point(*vit)[0];
+            else if(_mesh->point(*vit)[0] < Xmin) Xmin = _mesh->point(*vit)[0];
 
-        if(_mesh->point(*vit)[1] > Ymax) Ymax = _mesh->point(*vit)[1];
-        else if(_mesh->point(*vit)[1] < Ymin) Ymin = _mesh->point(*vit)[1];
+            if(_mesh->point(*vit)[1] > Ymax) Ymax = _mesh->point(*vit)[1];
+            else if(_mesh->point(*vit)[1] < Ymin) Ymin = _mesh->point(*vit)[1];
 
-        if(_mesh->point(*vit)[2] > Zmax) Zmax = _mesh->point(*vit)[2];
-        else if(_mesh->point(*vit)[2] < Zmin) Zmin = _mesh->point(*vit)[2];
+            if(_mesh->point(*vit)[2] > Zmax) Zmax = _mesh->point(*vit)[2];
+            else if(_mesh->point(*vit)[2] < Zmin) Zmin = _mesh->point(*vit)[2];
+        }
     }
 
-    cellSizex = ((Xmax - Xmin)/TAB_SIZE)+1;
-    cellSizey = ((Ymax - Ymin)/TAB_SIZE)+1;
-    cellSizez = ((Zmax - Zmin)/TAB_SIZE)+1;
+    cellSizex = ((Xmax - Xmin)/TAB_SIZE)+0.00000001;
+    cellSizey = ((Ymax - Ymin)/TAB_SIZE)+0.00000001;
+    cellSizez = ((Zmax - Zmin)/TAB_SIZE)+0.00000001;
 
+    cout << "Bound box is (" << Xmin << "," << Ymin << "," << Zmin << ") to (" << Xmax << "," << Ymax << "," << Zmax << ")" << endl;
+    cout << "Cell sizes are (" << cellSizex << "," << cellSizey << "," << cellSizez << ")" << endl;
     diagBoundBox = sqrt((Xmax-Xmin)*(Xmax-Xmin) + (Ymax-Ymin)*(Ymax-Ymin) + (Zmax-Zmin)*(Zmax-Zmin));
 
     //Distribution des points dans les clusters correspondants
@@ -50,8 +63,8 @@ void MainWindow::initData(MyMesh *_mesh)
         cellX = (_mesh->point(*vit)[0]-Xmin)/cellSizex;
         cellY = (_mesh->point(*vit)[1]-Ymin)/cellSizey;
         cellZ = (_mesh->point(*vit)[2]-Zmin)/cellSizez;
-        //cout << "Point " << it->id << " ("<< it->x << "," << it->y << "," << it->z << ") at cell " << cellX << ", " << cellY << ", " << cellZ << endl;
-        //getchar();
+        cout << "Point " << vit->idx() << " ("<< _mesh->point(*vit)[0] << "," << _mesh->point(*vit)[1] << "," << _mesh->point(*vit)[2] << ") at cell " << cellX << ", " << cellY << ", " << cellZ << endl;
+//        getchar();
         cluster[cellX][cellY][cellZ].push_back(_mesh->point(*vit));
     }
 
@@ -61,105 +74,96 @@ void MainWindow::initData(MyMesh *_mesh)
 
 QVector<MyMesh::Point> MainWindow::rangeSearch(MyMesh *_mesh, int pid, float range)
 {
-    QVector<MyMesh::Point> inRange;
-    MyMesh::Point p = _mesh->point(_mesh->vertex_handle(pid));
-    int pidCellX = (p[0]-Xmin)/cellSizex;
-    int pidCellY = (p[1]-Ymin)/cellSizey;
-    int pidCellZ = (p[2]-Zmin)/cellSizez;
+        QVector<MyMesh::Point> inRange;
+        MyMesh::Point p = _mesh->point(_mesh->vertex_handle(pid));
+        int pidCellX = (p[0]-Xmin)/cellSizex;
+        int pidCellY = (p[1]-Ymin)/cellSizey;
+        int pidCellZ = (p[2]-Zmin)/cellSizez;
 
-    int cellPosXRange = 0;
-    int cellPosYRange = 0;
-    int cellPosZRange = 0;
-    int cellNegXRange = 0;
-    int cellNegYRange = 0;
-    int cellNegZRange = 0;
+        int cellPosXRange = 0;
+        int cellPosYRange = 0;
+        int cellPosZRange = 0;
+        int cellNegXRange = 0;
+        int cellNegYRange = 0;
+        int cellNegZRange = 0;
 
-    //cout << pList.at(pid).x << endl << cellSizex << endl << range << endl;
-    int Xrange = (p[0]-cellSizex*pidCellX)+range;
-    while(Xrange>cellSizex) {Xrange-=cellSizex; cellPosXRange++;}
-    int Yrange = (p[1]-cellSizey*pidCellY)+range;
-    while(Yrange>cellSizey) {Yrange-=cellSizey; cellPosYRange++;}
-    int Zrange = (p[2]-cellSizez*pidCellZ)+range;
-    while(Zrange>cellSizez) {Zrange-=cellSizez; cellPosZRange++;}
+        //cout << pList.at(pid).x << endl << cellSizex << endl << range << endl;
+        int Xrange = (p[0]-cellSizex*pidCellX)+range;
+        while(Xrange>cellSizex) {Xrange-=cellSizex; cellPosXRange++;}
+        int Yrange = (p[1]-cellSizey*pidCellY)+range;
+        while(Yrange>cellSizey) {Yrange-=cellSizey; cellPosYRange++;}
+        int Zrange = (p[2]-cellSizez*pidCellZ)+range;
+        while(Zrange>cellSizez) {Zrange-=cellSizez; cellPosZRange++;}
 
-    Xrange = (p[0]-cellSizex*pidCellX)-range;
-    while(Xrange<0) {Xrange+=cellSizex; cellNegXRange++;}
-    Yrange = (p[1]-cellSizey*pidCellY)-range;
-    while(Yrange<0) {Yrange+=cellSizey; cellNegYRange++;}
-    Zrange = (p[2]-cellSizez*pidCellZ)-range;
-    while(Zrange<0) {Zrange+=cellSizez; cellNegZRange++;}
+        Xrange = (p[0]-cellSizex*pidCellX)-range;
+        while(Xrange<0) {Xrange+=cellSizex; cellNegXRange++;}
+        Yrange = (p[1]-cellSizey*pidCellY)-range;
+        while(Yrange<0) {Yrange+=cellSizey; cellNegYRange++;}
+        Zrange = (p[2]-cellSizez*pidCellZ)-range;
+        while(Zrange<0) {Zrange+=cellSizez; cellNegZRange++;}
 
-    //cout << "Cell range is " << cellPosXRange << " on Positive X, " << cellPosYRange << " on Positive Y, " << cellPosZRange << " on Positive Z" << endl;
-    //cout << "Cell range is " << cellNegXRange << " on Negative X, " << cellNegYRange << " on Negative Y, " << cellNegZRange << " on Negative Z" << endl;
-    int beginX = pidCellX-cellNegXRange;
-    if(beginX<0) beginX = 0;
-    int beginY = pidCellY-cellNegYRange;
-    if(beginY<0) beginY = 0;
-    int beginZ = pidCellZ-cellNegZRange;
-    if(beginZ<0) beginZ = 0;
+//        cout << "Cell range is " << cellPosXRange << " on Positive X, " << cellPosYRange << " on Positive Y, " << cellPosZRange << " on Positive Z" << endl;
+//        cout << "Cell range is " << cellNegXRange << " on Negative X, " << cellNegYRange << " on Negative Y, " << cellNegZRange << " on Negative Z" << endl;
+        int beginX = pidCellX-cellNegXRange;
+        if(beginX<0) beginX = 0;
+        int beginY = pidCellY-cellNegYRange;
+        if(beginY<0) beginY = 0;
+        int beginZ = pidCellZ-cellNegZRange;
+        if(beginZ<0) beginZ = 0;
 
-    int x,y,z;
-    QList<MyMesh::Point>::iterator it;
-    for(x = beginX; x<=pidCellX+cellPosXRange && x<TAB_SIZE; x++)
-        for(y = beginY; y<=pidCellY+cellPosYRange && y<TAB_SIZE; y++)
-            for(z = beginZ; z<=pidCellZ+cellPosZRange && z<TAB_SIZE; z++)
-            {
-                //cout << "Looking into [" << x << "][" << y << "][" << z << "]" << endl;
-                for(it = cluster[x][y][z].begin(); it != cluster[x][y][z].end(); ++it)
+        int x,y,z;
+        vector<MyMesh::Point>::iterator it;
+        for(x = beginX; x<=pidCellX+cellPosXRange && x<TAB_SIZE; x++)
+            for(y = beginY; y<=pidCellY+cellPosYRange && y<TAB_SIZE; y++)
+                for(z = beginZ; z<=pidCellZ+cellPosZRange && z<TAB_SIZE; z++)
                 {
-                    //cout << it->id << endl;
-                    float distance = sqrt(pow(p[0]-(*it)[0],2)+pow(p[1]-(*it)[1],2)+pow(p[2]-(*it)[2],2));
-                    //cout << "Point " << it->id << " is at " << distance << " from " << pid << endl;
-                    if(distance<=range && distance != 0){
-//                        cout << "test" << endl;
-                        inRange.push_back(*it);
+//                    cout << "Looking into [" << x << "][" << y << "][" << z << "]" << endl;
+                    for(it = cluster[x][y][z].begin(); it != cluster[x][y][z].end(); ++it)
+                    {
+                        //cout << it->id << endl;
+                        float distance = sqrt(pow(p[0]-(*it)[0],2)+pow(p[1]-(*it)[1],2)+pow(p[2]-(*it)[2],2));
+                        //cout << "Point " << it->id << " is at " << distance << " from " << pid << endl;
+                        if(distance<=range && distance != 0){
+    //                        cout << "test" << endl;
+                            inRange.push_back(*it);
+                        }
                     }
                 }
-            }
-
-    // int count = 0;
-    // cout << "In range: ";
-    // for(it = inRange.begin(); it != inRange.end(); ++it)
-    // {
-    // 	count++;
-    // 	//cout << it->id << ", ";
-    // }
-    // cout << count << " points." << endl;
-//    cout << inRange.size() << "Size Range" << endl;
-    return inRange;
+//        cout << inRange.size() << "in range (" << range << ")" << endl;
+        return inRange;
 }
 
-void MainWindow::Neighbourhood(MyMesh *_mesh)
-{
-    unsigned int i;
+//void MainWindow::Neighbourhood(MyMesh *_mesh)
+//{
+//    unsigned int i;
 
-    //Calcul des dimensions virtuelles des clusters
-    cout << "Calculating clusters size..." << endl;
-    initData(&mesh);
-    cout << cellSizex << ", " << cellSizey << ", " << cellSizez << endl;
+//    //Calcul des dimensions virtuelles des clusters
+//    cout << "Calculating clusters size..." << endl;
+//    initData(&mesh);
+//    cout << cellSizex << ", " << cellSizey << ", " << cellSizez << endl;
 
-    clock_t t1, t2;
-    //Recherche
-    t1 = clock();
-    for(i = 0; i<_mesh->n_vertices(); i++)
-    {
-        if(i%1000==0)
-        {
-            cout << i << "/" << POINTS_POOL << endl;
-        }
-        rangeSearch(&mesh, i, diagBoundBox*0.003);
-        rangeSearch(&mesh, i, diagBoundBox*0.006);
-        rangeSearch(&mesh, i, diagBoundBox*0.009);
-        rangeSearch(&mesh, i, diagBoundBox*0.012);
-        rangeSearch(&mesh, i, diagBoundBox*0.015);
-        rangeSearch(&mesh, i, diagBoundBox*0.018);
-    }
-    t2 = clock();
-    cout << " (" << static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC) << "s)" << endl;
+//    clock_t t1, t2;
+//    //Recherche
+//    t1 = clock();
+//    for(i = 0; i<_mesh->n_vertices(); i++)
+//    {
+//        if(i%1000==0)
+//        {
+//            cout << i << "/" << POINTS_POOL << endl;
+//        }
+//        rangeSearch(&mesh, i, diagBoundBox*0.003);
+//        rangeSearch(&mesh, i, diagBoundBox*0.006);
+//        rangeSearch(&mesh, i, diagBoundBox*0.009);
+//        rangeSearch(&mesh, i, diagBoundBox*0.012);
+//        rangeSearch(&mesh, i, diagBoundBox*0.015);
+//        rangeSearch(&mesh, i, diagBoundBox*0.018);
+//    }
+//    t2 = clock();
+//    cout << " (" << static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC) << "s)" << endl;
 
-    cout << "Done." << endl;
+//    cout << "Done." << endl;
 
-}
+//}
 
 void MainWindow::H_Curv(MyMesh* _mesh)
 {
@@ -179,34 +183,91 @@ float MainWindow::GWAMC(MyMesh* _mesh, float delta, QVector<MyMesh::Point> N, Ve
 //    float GWA[_mesh->n_vertices()];
     int id = X.idx();
     MyMesh::Point Xp = _mesh->point(_mesh->vertex_handle(id));
-    double top = 0;
-    double bot = 0;
+    float top = 0;
+    float bot = 0;
+//    cout << Curvature[id] << endl;
     for (int i = 0; i < N.size(); ++i) {
-        top += Curvature[id] * exp (-(norm(Xp-N.at(i))*norm(Xp-N.at(i)))/2*delta*delta);
+        top += Curvature[id] * exp (-(norm(Xp-N.at(i))*norm(Xp-N.at(i)))/(2*delta*delta));
 //        cout << "Curvature[id] * exp ((norm(Xp-N.at(i))*norm(Xp-N.at(i)))/2*delta*delta)" << endl;
-        bot += exp (-(norm(Xp-N.at(i))*norm(Xp-N.at(i)))/2*delta*delta);
+        bot += exp (-(norm(Xp-N.at(i))*norm(Xp-N.at(i)))/(2*delta*delta));
     }
 //    cout << Curvature[id] << " curvature " << endl;
 //    cout << " valeur bot et top sommet " << id << " : " << top << "/" << bot << endl;
-    if (bot = 0)
+    if (bot == 0)
         return 0;
     return top/bot;
 }
 
+void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v){
+    QVector<MyMesh::Point> N1;
+    QVector<MyMesh::Point> N2;
+    QVector<MyMesh::Point> N3;
+    QVector<MyMesh::Point> N4;
+    QVector<MyMesh::Point> N5;
+    QVector<MyMesh::Point> N6;
+    QVector<MyMesh::Point> N7;
+    QVector<MyMesh::Point> N8;
+    QVector<MyMesh::Point> N9;
+    future<QVector<MyMesh::Point>> FN1 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.003);
+    future<QVector<MyMesh::Point>> FN2 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.006);
+    future<QVector<MyMesh::Point>> FN3 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.009);
+    future<QVector<MyMesh::Point>> FN4 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.012);
+    future<QVector<MyMesh::Point>> FN5 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.015);
+    future<QVector<MyMesh::Point>> FN6 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.018);
+    future<QVector<MyMesh::Point>> FN7 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.024);
+    future<QVector<MyMesh::Point>> FN8 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.030);
+    future<QVector<MyMesh::Point>> FN9 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.036);
+    N1 = FN1.get();
+    N2 = FN2.get();
+    N3 = FN3.get();
+    N4 = FN4.get();
+    N5 = FN5.get();
+    N6 = FN6.get();
+    N7 = FN7.get();
+    N8 = FN8.get();
+    N9 = FN9.get();
+//        cout << N.size() << " N size" << endl;
+    float delta1 = GWAMC(_mesh,diagBoundBox*0.003,N1,v);
+    float delta2 = GWAMC(_mesh,diagBoundBox*0.006,N2,v);
+    float delta3 = GWAMC(_mesh,diagBoundBox*0.009,N3,v);
+    float delta4 = GWAMC(_mesh,diagBoundBox*0.012,N4,v);
+    float delta5 = GWAMC(_mesh,diagBoundBox*0.015,N5,v);
+    float delta6 = GWAMC(_mesh,diagBoundBox*0.018,N6,v);
+    float delta7 = GWAMC(_mesh,diagBoundBox*0.024,N7,v);
+    float delta8 = GWAMC(_mesh,diagBoundBox*0.030,N8,v);
+    float delta9 = GWAMC(_mesh,diagBoundBox*0.036,N9,v);
+//        cout << delta1 << ',' << delta2 << endl;
+//        if (delta1 != delta2)
+//            cout << delta1 << " " << delta2 << " saliency "<< endl;
+    _mesh->data(v).value = (abs(delta1-delta2)+abs(delta2-delta4)+abs(delta3-delta6)+abs(delta4-delta7)+abs(delta5-delta8)+abs(delta6-delta9))/6;
+    N1.clear();
+    N2.clear();
+    N3.clear();
+    N4.clear();
+    N5.clear();
+    N6.clear();
+    N7.clear();
+    N8.clear();
+    N9.clear();
+}
+
 void MainWindow::saliency(MyMesh* _mesh){
     initData(&mesh);
+    int i = 0;
+    clock_t t1, t2;
     for (MyMesh::VertexIter vit = _mesh->vertices_begin(); vit != _mesh->vertices_end(); ++vit)
     {
-        QVector<MyMesh::Point> N;
-        N = rangeSearch(&mesh, (*vit).idx(),diagBoundBox*0.02);
-//        cout << N.size() << " N size" << endl;
-        float delta1 = GWAMC(_mesh,diagBoundBox*0.02,N,(*vit));
-        float delta2 = GWAMC(_mesh,diagBoundBox*2*0.02,N,(*vit));
-        if (delta1 != delta2)
-            cout << delta1 << " " << delta2 << " saliency "<< endl;
-        _mesh->data(*vit).value = abs(delta1 - delta2);
-        N.clear();
+        if(i%1000 == 0) t1 = clock();
+        async(launch::async, [&](MyMesh *m, VertexHandle v){return vertexThreading(m, v);}, &mesh, *vit);
+        if(i%1000 == 999)
+        {
+            cout << i << "/" << _mesh->n_vertices() << endl;
+            t2 = clock();
+            cout << "RS (" << static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC) << "s)" << endl;
+        }
+        i++;
     }
+
 }
 
 float MainWindow::calculateCurveOnVertex(MyMesh* _mesh, int vertexID)
@@ -916,10 +977,7 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    initData(&mesh);
     saliency(&mesh);
-    displayMesh(&mesh);
-
-    delete [] cluster;
-    cluster = NULL;
+    //decimation(&mesh);
+    displayMesh(&mesh,true);
 }

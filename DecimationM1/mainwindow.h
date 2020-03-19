@@ -19,6 +19,9 @@
 #include <math.h>
 #include <time.h>
 #include <cmath>
+#include <future>
+
+#define TAB_SIZE 20
 
 namespace Ui {
 class MainWindow;
@@ -28,6 +31,13 @@ using namespace OpenMesh;
 using namespace OpenMesh::Attributes;
 
 using namespace std;
+
+struct RPoint
+{
+    int x;
+    int y;
+    int z;
+};
 
 struct MyTraits : public OpenMesh::DefaultTraits
 {
@@ -76,13 +86,14 @@ public:
     float angleFF(MyMesh *_mesh, int faceID0, int faceID1, int vertID0, int vertID1);
     float calculateCurveOnVertex(MyMesh *_mesh, int vertexID);
     void H_Curv(MyMesh *_mesh);
+    void vertexThreading(MyMesh* _mesh, VertexHandle v);
     float GWAMC(MyMesh *_mesh, float delta, QVector<MyMesh::Point> N, VertexHandle X);
 
     float *Curvature;
+    QVector<MyMesh::Point> rangeSearch(MyMesh *_mesh, int pid, float range);
     void saliency(MyMesh *_mesh);
     void initData(MyMesh *_mesh);
     void Neighbourhood(MyMesh *_mesh);
-    QVector<MyMesh::Point> rangeSearch(MyMesh *_mesh, int pid, float range);
 private slots:
 
     void on_pushButton_chargement_clicked();
@@ -118,10 +129,7 @@ private:
     float diagBoundBox;
 
     QVector<MyMesh::Point> pList;
-    QList<MyMesh::Point> ***cluster;
-
-    int TAB_SIZE = 120;
-    int POINTS_POOL = 1200000;
+    array<array<array<vector<MyMesh::Point>, TAB_SIZE>, TAB_SIZE>, TAB_SIZE> cluster;
 
     bool modevoisinage;
 

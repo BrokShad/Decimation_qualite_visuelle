@@ -21,7 +21,7 @@
 #include <cmath>
 #include <future>
 
-#define TAB_SIZE 20
+#define TAB_SIZE 120
 
 namespace Ui {
 class MainWindow;
@@ -128,8 +128,8 @@ private:
     float cellSizez;
     float diagBoundBox;
 
-    QVector<MyMesh::Point> pList;
-    array<array<array<vector<MyMesh::Point>, TAB_SIZE>, TAB_SIZE>, TAB_SIZE> cluster;
+//    array<array<array<vector<MyMesh::Point>, TAB_SIZE>, TAB_SIZE>, TAB_SIZE> cluster;
+    vector<MyMesh::Point> ***cluster;
 
     bool modevoisinage;
 

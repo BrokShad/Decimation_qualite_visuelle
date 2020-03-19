@@ -12,16 +12,16 @@ void MainWindow::initData(MyMesh *_mesh)
 {
     //Génération de l'espace de clusters
     cout << "Attribution..." << endl;
-//    cluster = new QList<MyMesh::Point>**[TAB_SIZE];
-//    for(int i=0; i<TAB_SIZE; i++)
-//    {
-////        cout << i << "/" << TAB_SIZE << endl;
-//        cluster[i] = new QList<MyMesh::Point>*[TAB_SIZE];
-//        for(int j=0; j<TAB_SIZE; j++)
-//        {
-//            cluster[i][j] = new QList<MyMesh::Point>[TAB_SIZE];
-//        }
-//    }
+    cluster = new vector<MyMesh::Point>**[TAB_SIZE];
+    for(int i=0; i<TAB_SIZE; i++)
+    {
+//        cout << i << "/" << TAB_SIZE << endl;
+        cluster[i] = new vector<MyMesh::Point>*[TAB_SIZE];
+        for(int j=0; j<TAB_SIZE; j++)
+        {
+            cluster[i][j] = new vector<MyMesh::Point>[TAB_SIZE];
+        }
+    }
 
     for (MyMesh::VertexIter vit = _mesh->vertices_begin(); vit != _mesh->vertices_end(); ++vit)
     {
@@ -47,9 +47,9 @@ void MainWindow::initData(MyMesh *_mesh)
         }
     }
 
-    cellSizex = ((Xmax - Xmin)/TAB_SIZE)+0.00000001;
-    cellSizey = ((Ymax - Ymin)/TAB_SIZE)+0.00000001;
-    cellSizez = ((Zmax - Zmin)/TAB_SIZE)+0.00000001;
+    cellSizex = ((Xmax - Xmin)/TAB_SIZE)+0.00001;
+    cellSizey = ((Ymax - Ymin)/TAB_SIZE)+0.00001;
+    cellSizez = ((Zmax - Zmin)/TAB_SIZE)+0.00001;
 
     cout << "Bound box is (" << Xmin << "," << Ymin << "," << Zmin << ") to (" << Xmax << "," << Ymax << "," << Zmax << ")" << endl;
     cout << "Cell sizes are (" << cellSizex << "," << cellSizey << "," << cellSizez << ")" << endl;
@@ -88,18 +88,18 @@ QVector<MyMesh::Point> MainWindow::rangeSearch(MyMesh *_mesh, int pid, float ran
         int cellNegZRange = 0;
 
         //cout << pList.at(pid).x << endl << cellSizex << endl << range << endl;
-        int Xrange = (p[0]-cellSizex*pidCellX)+range;
+        float Xrange = p[0]-Xmin-(cellSizex*pidCellX)+range;
         while(Xrange>cellSizex) {Xrange-=cellSizex; cellPosXRange++;}
-        int Yrange = (p[1]-cellSizey*pidCellY)+range;
+        float Yrange = p[1]-Ymin-(cellSizey*pidCellY)+range;
         while(Yrange>cellSizey) {Yrange-=cellSizey; cellPosYRange++;}
-        int Zrange = (p[2]-cellSizez*pidCellZ)+range;
+        float Zrange = p[2]-Zmin-(cellSizez*pidCellZ)+range;
         while(Zrange>cellSizez) {Zrange-=cellSizez; cellPosZRange++;}
 
-        Xrange = (p[0]-cellSizex*pidCellX)-range;
+        Xrange = p[0]-Xmin-(cellSizex*pidCellX)-range;
         while(Xrange<0) {Xrange+=cellSizex; cellNegXRange++;}
-        Yrange = (p[1]-cellSizey*pidCellY)-range;
+        Yrange = p[1]-Ymin-(cellSizey*pidCellY)-range;
         while(Yrange<0) {Yrange+=cellSizey; cellNegYRange++;}
-        Zrange = (p[2]-cellSizez*pidCellZ)-range;
+        Zrange = p[2]-Zmin-(cellSizez*pidCellZ)-range;
         while(Zrange<0) {Zrange+=cellSizez; cellNegZRange++;}
 
 //        cout << "Cell range is " << cellPosXRange << " on Positive X, " << cellPosYRange << " on Positive Y, " << cellPosZRange << " on Positive Z" << endl;
@@ -124,12 +124,13 @@ QVector<MyMesh::Point> MainWindow::rangeSearch(MyMesh *_mesh, int pid, float ran
                         float distance = sqrt(pow(p[0]-(*it)[0],2)+pow(p[1]-(*it)[1],2)+pow(p[2]-(*it)[2],2));
                         //cout << "Point " << it->id << " is at " << distance << " from " << pid << endl;
                         if(distance<=range && distance != 0){
-    //                        cout << "test" << endl;
+//                            cout << "New point added (distance is " << distance << ")" << endl;
                             inRange.push_back(*it);
                         }
                     }
                 }
-//        cout << inRange.size() << "in range (" << range << ")" << endl;
+//        cout << inRange.size() << " in range (" << range << ")" << endl;
+//        exit(0);
         return inRange;
 }
 

@@ -200,33 +200,15 @@ float MainWindow::GWAMC(MyMesh* _mesh, float delta, QVector<MyMesh::Point> N, Ve
 }
 
 void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v){
-    QVector<MyMesh::Point> N1;
-    QVector<MyMesh::Point> N2;
-    QVector<MyMesh::Point> N3;
-    QVector<MyMesh::Point> N4;
-    QVector<MyMesh::Point> N5;
-    QVector<MyMesh::Point> N6;
-    QVector<MyMesh::Point> N7;
-    QVector<MyMesh::Point> N8;
-    QVector<MyMesh::Point> N9;
-    future<QVector<MyMesh::Point>> FN1 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.003);
-    future<QVector<MyMesh::Point>> FN2 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.006);
-    future<QVector<MyMesh::Point>> FN3 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.009);
-    future<QVector<MyMesh::Point>> FN4 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.012);
-    future<QVector<MyMesh::Point>> FN5 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.015);
-    future<QVector<MyMesh::Point>> FN6 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.018);
-    future<QVector<MyMesh::Point>> FN7 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.024);
-    future<QVector<MyMesh::Point>> FN8 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.030);
-    future<QVector<MyMesh::Point>> FN9 = async(launch::async, [&](MyMesh *m, int p, float r){return rangeSearch(m, p, r);}, &mesh, v.idx(), diagBoundBox*0.036);
-    N1 = FN1.get();
-    N2 = FN2.get();
-    N3 = FN3.get();
-    N4 = FN4.get();
-    N5 = FN5.get();
-    N6 = FN6.get();
-    N7 = FN7.get();
-    N8 = FN8.get();
-    N9 = FN9.get();
+    QVector<MyMesh::Point> N1 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.003);
+    QVector<MyMesh::Point> N2 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.006);
+    QVector<MyMesh::Point> N3 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.009);
+    QVector<MyMesh::Point> N4 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.012);
+    QVector<MyMesh::Point> N5 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.015);
+    QVector<MyMesh::Point> N6 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.018);
+    QVector<MyMesh::Point> N7 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.024);
+    QVector<MyMesh::Point> N8 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.030);
+    QVector<MyMesh::Point> N9 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.036);
 //        cout << N.size() << " N size" << endl;
     float delta1 = GWAMC(_mesh,diagBoundBox*0.003,N1,v);
     float delta2 = GWAMC(_mesh,diagBoundBox*0.006,N2,v);
@@ -259,7 +241,7 @@ void MainWindow::saliency(MyMesh* _mesh){
     for (MyMesh::VertexIter vit = _mesh->vertices_begin(); vit != _mesh->vertices_end(); ++vit)
     {
         if(i%1000 == 0) t1 = clock();
-        async(launch::async, [&](MyMesh *m, VertexHandle v){return vertexThreading(m, v);}, &mesh, *vit);
+        vertexThreading(&mesh, *vit);
         if(i%1000 == 999)
         {
             cout << i << "/" << _mesh->n_vertices() << endl;

@@ -1,4 +1,8 @@
 # Decimation qualite visuelle
+
+Pour executer un build si la librairie libOpenMesh est manquante:
+- $ LD_LIBRARY_PATH=/home/$user$/Decimation_qualite_visuelle/OpenMesh/liblinux/
+- $ export LD_LIBRARY_PATH
  
  **Sprint**  
  

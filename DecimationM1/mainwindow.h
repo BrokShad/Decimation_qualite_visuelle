@@ -21,7 +21,7 @@
 #include <cmath>
 #include <future>
 
-#define TAB_SIZE 120
+#define TAB_SIZE 200
 
 namespace Ui {
 class MainWindow;

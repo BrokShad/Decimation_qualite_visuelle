@@ -392,8 +392,9 @@ float MainWindow::faceArea(MyMesh* _mesh, int faceID)
         VertexHandle vertex_h = *curVer;
         points.push_back(_mesh->point(vertex_h));
     }
-
-    return norm((points[1] - points[0]) % (points[2] - points[0])) / 2;
+    float area = norm((points[1] - points[0]) % (points[2] - points[0])) / 2;
+    points.clear();
+    return area;
 }
 
 

@@ -114,6 +114,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		../DecimationM1/.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -134,7 +135,12 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../DecimationM1/starterLight.pro ../DecimationM1/mainwindow.h \
-		../DecimationM1/meshviewerwidget.h ../DecimationM1/main.cpp \
+		../DecimationM1/meshviewerwidget.h \
+		../../Desktop/Range \
+		search/ThreadPool.h \
+		../../Desktop/Range \
+		search/ThreadPool.h \
+		../DecimationM1/threadpool.h ../DecimationM1/main.cpp \
 		../DecimationM1/mainwindow.cpp \
 		../DecimationM1/meshviewerwidget.cpp
 QMAKE_TARGET  = starterLight
@@ -203,6 +209,7 @@ Makefile: ../DecimationM1/starterLight.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf \
@@ -283,6 +290,7 @@ Makefile: ../DecimationM1/starterLight.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/qt_config.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exclusive_builds.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/toolchain.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/default_pre.prf:
@@ -322,7 +330,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../DecimationM1/mainwindow.h ../DecimationM1/meshviewerwidget.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../DecimationM1/mainwindow.h ../DecimationM1/meshviewerwidget.h ../../Desktop/Range search/ThreadPool.h ../../Desktop/Range search/ThreadPool.h ../DecimationM1/threadpool.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../DecimationM1/main.cpp ../DecimationM1/mainwindow.cpp ../DecimationM1/meshviewerwidget.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../DecimationM1/mainwindow.ui $(DISTDIR)/
 
@@ -432,6 +440,7 @@ moc_mainwindow.cpp: ../OpenMesh/inc/OpenMesh/Core/IO/MeshIO.hh \
 		../OpenMesh/inc/OpenMesh/Core/Mesh/PolyMeshT.cc \
 		../OpenMesh/inc/OpenMesh/Core/Geometry/LoopSchemeMaskT.hh \
 		../OpenMesh/inc/OpenMesh/Core/Mesh/TriMeshT.cc \
+		../DecimationM1/threadpool.h \
 		../DecimationM1/mainwindow.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
@@ -547,7 +556,8 @@ main.o: ../DecimationM1/main.cpp ../DecimationM1/mainwindow.h \
 		../OpenMesh/inc/OpenMesh/Core/Geometry/MathDefs.hh \
 		../OpenMesh/inc/OpenMesh/Core/Mesh/PolyMeshT.cc \
 		../OpenMesh/inc/OpenMesh/Core/Geometry/LoopSchemeMaskT.hh \
-		../OpenMesh/inc/OpenMesh/Core/Mesh/TriMeshT.cc
+		../OpenMesh/inc/OpenMesh/Core/Mesh/TriMeshT.cc \
+		../DecimationM1/threadpool.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../DecimationM1/main.cpp
 
 mainwindow.o: ../DecimationM1/mainwindow.cpp ../DecimationM1/mainwindow.h \
@@ -624,7 +634,9 @@ mainwindow.o: ../DecimationM1/mainwindow.cpp ../DecimationM1/mainwindow.h \
 		../OpenMesh/inc/OpenMesh/Core/Mesh/PolyMeshT.cc \
 		../OpenMesh/inc/OpenMesh/Core/Geometry/LoopSchemeMaskT.hh \
 		../OpenMesh/inc/OpenMesh/Core/Mesh/TriMeshT.cc \
-		ui_mainwindow.h
+		../DecimationM1/threadpool.h \
+		ui_mainwindow.h \
+		../DecimationM1/meshviewerwidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../DecimationM1/mainwindow.cpp
 
 meshviewerwidget.o: ../DecimationM1/meshviewerwidget.cpp ../DecimationM1/meshviewerwidget.h \

@@ -12,16 +12,16 @@
 
 #include <stdlib.h>
 #include <list>
-#include <vector>
 #include <iterator>
 #include <iostream>
 #include <algorithm>
 #include <math.h>
 #include <time.h>
 #include <cmath>
-#include <future>
 
-#define TAB_SIZE 200
+#include "threadpool.h"
+
+#define TAB_SIZE 70
 
 namespace Ui {
 class MainWindow;
@@ -32,11 +32,23 @@ using namespace OpenMesh::Attributes;
 
 using namespace std;
 
-struct RPoint
+struct Dual
 {
-    int x;
-    int y;
-    int z;
+    int id;
+    int val;
+
+    bool operator < (const Dual& b) const
+    {
+        return (val < b.val);
+    }
+};
+
+struct DualOp
+{
+    inline bool operator() (const Dual& a, const Dual& b)
+    {
+        return (a.val < b.val);
+    }
 };
 
 struct MyTraits : public OpenMesh::DefaultTraits
@@ -66,8 +78,8 @@ public:
 
     // les fonctions à compléter
     void showEdgeSelection(MyMesh* _mesh);
-    void collapseEdge(MyMesh* _mesh, int edgeID);
-    void decimation(MyMesh* _mesh, int percent, QString method);
+    int collapseEdge(MyMesh* _mesh, int edgeID);
+    void decimation(MyMesh* _mesh, int percent);
     void updateEdgeSelectionIHM();
     int smallestEdge(MyMesh* _mesh);
     void displayMesh(MyMesh *_mesh, bool isTemperatureMap = false, float mapRange = -1);
@@ -77,6 +89,7 @@ public:
     int getSmallestAngle(MyMesh *_mesh);
     int getSmallestPlan(MyMesh *_mesh);
     int getSmallestRatio(MyMesh *_mesh);
+    int getSmallestSaliency(MyMesh *_mesh);
     float getAngleFF(MyMesh *_mesh, int faceID0, int faceID1);
     int getSmallestEdge(MyMesh *_mesh);
     int getSmallestEdgeFace(MyMesh *_mesh);
@@ -106,6 +119,8 @@ private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
+
+    void on_saliencyProgressBar_valueChanged(int value);
 
 private:
 

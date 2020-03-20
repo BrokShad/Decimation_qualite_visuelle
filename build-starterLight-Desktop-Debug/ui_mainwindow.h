@@ -21,6 +21,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPlainTextEdit>
+#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QSpacerItem>
@@ -63,6 +64,7 @@ public:
     QPushButton *pushButton_decimate;
     QPushButton *pushButton;
     QPushButton *pushButton_2;
+    QProgressBar *saliencyProgressBar;
     QSpacerItem *verticalSpacer;
     MeshViewerWidget *displayWidget;
     QMenuBar *menuBar;
@@ -253,6 +255,13 @@ public:
         pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
 
         verticalLayout->addWidget(pushButton_2);
+
+        saliencyProgressBar = new QProgressBar(widget_2);
+        saliencyProgressBar->setObjectName(QStringLiteral("saliencyProgressBar"));
+        saliencyProgressBar->setAutoFillBackground(false);
+        saliencyProgressBar->setValue(0);
+
+        verticalLayout->addWidget(saliencyProgressBar);
 
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 

@@ -208,7 +208,7 @@ void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v){
     QVector<MyMesh::Point> N6 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.018);
     QVector<MyMesh::Point> N7 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.024);
     QVector<MyMesh::Point> N8 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.030);
-    QVector<MyMesh::Point> N9 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.036);
+//    QVector<MyMesh::Point> N9 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.036);
 //        cout << N.size() << " N size" << endl;
     float delta1 = GWAMC(_mesh,diagBoundBox*0.003,N1,v);
     float delta2 = GWAMC(_mesh,diagBoundBox*0.006,N2,v);
@@ -218,11 +218,11 @@ void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v){
     float delta6 = GWAMC(_mesh,diagBoundBox*0.018,N6,v);
     float delta7 = GWAMC(_mesh,diagBoundBox*0.024,N7,v);
     float delta8 = GWAMC(_mesh,diagBoundBox*0.030,N8,v);
-    float delta9 = GWAMC(_mesh,diagBoundBox*0.036,N9,v);
+//    float delta9 = GWAMC(_mesh,diagBoundBox*0.036,N9,v);
 //        cout << delta1 << ',' << delta2 << endl;
 //        if (delta1 != delta2)
 //            cout << delta1 << " " << delta2 << " saliency "<< endl;
-    _mesh->data(v).value = (abs(delta1-delta2)+abs(delta2-delta4)+abs(delta3-delta6)+abs(delta4-delta7)+abs(delta5-delta8)+abs(delta6-delta9))/6;
+    _mesh->data(v).value = (abs(delta1-delta2)+abs(delta2-delta4)+abs(delta3-delta6)+abs(delta4-delta7)+abs(delta5-delta8)/*+abs(delta6-delta9)*/)/4;
     N1.clear();
     N2.clear();
     N3.clear();
@@ -231,22 +231,28 @@ void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v){
     N6.clear();
     N7.clear();
     N8.clear();
-    N9.clear();
+//    N9.clear();
 }
 
 void MainWindow::saliency(MyMesh* _mesh){
     initData(&mesh);
-    int i = 0;
     clock_t t1, t2;
+    int i = 0;
+//    int progress;
+//    ThreadPool tp(std::thread::hardware_concurrency());
+//    cout << "Threads: " << std::thread::hardware_concurrency() << endl;
     for (MyMesh::VertexIter vit = _mesh->vertices_begin(); vit != _mesh->vertices_end(); ++vit)
     {
+//        progress = (int)(i/mesh.n_vertices()*100);
+//        if(progress > ui->saliencyProgressBar->value()) ui->saliencyProgressBar->setValue(progress);
         if(i%1000 == 0) t1 = clock();
+//        tp.enqueue([&](MyMesh* m, VertexHandle v){vertexThreading(m, v);}, &mesh, *vit);
+//        async(launch::async, [&](MyMesh *m, VertexHandle v){return vertexThreading(m, v);}, &mesh, *vit);
         vertexThreading(&mesh, *vit);
         if(i%1000 == 999)
         {
-            cout << i << "/" << _mesh->n_vertices() << endl;
             t2 = clock();
-            cout << "RS (" << static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC) << "s)" << endl;
+            cout << i << "/" << mesh.n_vertices() << " (" << static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC) << "s since last update)" << endl;
         }
         i++;
     }
@@ -422,6 +428,27 @@ int MainWindow::getSmallestEdge(MyMesh* _mesh){
     return id_smallest;
 }
 
+int MainWindow::getSmallestSaliency(MyMesh* _mesh)
+{
+    float smallest = INT_MAX;
+    int id_smallest;
+    float current_value;
+    // parcours de toutes les arêtes
+    for (MyMesh::EdgeIter curEdge = _mesh->edges_begin(); curEdge != _mesh->edges_end(); curEdge++)
+    {
+        EdgeHandle eh = EdgeHandle((*curEdge).idx());
+        HalfedgeHandle heh = _mesh->halfedge_handle(eh,0);
+        //si la taille de l'edge courrante est plus petite que la taille min, on actualise la taille du minimum ainsi que son id
+        current_value = (_mesh->data(_mesh->from_vertex_handle(heh)).value+_mesh->data(_mesh->to_vertex_handle(heh)).value)/2;
+        if(current_value < smallest)
+        {
+            smallest = current_value;
+            id_smallest = eh.idx();
+        }
+    }
+    return id_smallest;
+}
+
 int MainWindow::getSmallestEdgeFace(MyMesh* _mesh){
 
     //cette fonction retour le plus petit rapport entre la taille de l'edge et l'aire des faces adjacentes
@@ -449,8 +476,9 @@ int MainWindow::getSmallestEdgeFace(MyMesh* _mesh){
     return id_smallest;
 }
 
-void MainWindow::collapseEdge(MyMesh* _mesh, int edgeID)
+int MainWindow::collapseEdge(MyMesh* _mesh, int edgeID)
 {
+    int r;
     EdgeHandle eh = EdgeHandle(edgeID);
     HalfedgeHandle heh = _mesh->halfedge_handle(eh, 0);
     //avant de supprimer une edge on vérifie qu'elle peut effectivement etre supprimée
@@ -461,10 +489,12 @@ void MainWindow::collapseEdge(MyMesh* _mesh, int edgeID)
 
         _mesh->set_point(Destination, midpoint);
         _mesh->collapse(heh);
+        r = 1;
     }
-
+    else r = 0;
 
     _mesh->garbage_collection();
+    return r;
 }
 
 // fonction pratique pour faire des tirages aléatoires
@@ -609,57 +639,41 @@ float MainWindow::getAngleFF(MyMesh* _mesh, int faceID0, int faceID1)
     return angle;
 }
 
-
-void MainWindow::decimation(MyMesh* _mesh, int percent, QString method)
+void MainWindow::decimation(MyMesh* _mesh, int percent)
 {
-    /* **** à compléter ! (Partie 2 et 3) ****
-     * Cette fonction supprime des arêtes jusqu'à atteindre un pourcentage d'arêtes restantes, selon un critère donné
-     * percent : pourcentage de l'objet à garder
-     * method  : la méthode à utiliser parmis : "Aléatoire", "Par taille", "Par angle", "Par planéité"
-     */
-    unsigned int edgeCount = _mesh->n_edges();
-    unsigned int finalEgdeCount = (edgeCount * percent)/100;
-
-    if(method == "Aléatoire"){
-        int edge = randInt(0, _mesh->n_edges());
-        while(_mesh->n_edges() > finalEgdeCount){
-            collapseEdge(_mesh, edge);
-            edge = randInt(0, _mesh->n_edges());
-        }
-
+    cout << "Decimating..." << endl;
+    unsigned int finalEgdeCount = (_mesh->n_edges() * percent)/100;
+    clock_t t1, t2;
+    int i = 0;
+    Dual current_dual;
+    list<Dual> edgeList;
+    for (MyMesh::EdgeIter curEdge = _mesh->edges_begin(); curEdge != _mesh->edges_end(); curEdge++)
+    {
+        EdgeHandle eh = EdgeHandle((*curEdge).idx());
+        current_dual.id = eh.idx();
+        HalfedgeHandle heh = _mesh->halfedge_handle(eh,0);
+        current_dual.val = (_mesh->data(_mesh->from_vertex_handle(heh)).value+_mesh->data(_mesh->to_vertex_handle(heh)).value)/2;
+        edgeList.push_back(current_dual);
     }
-    else if(method == "Par taille"){
-
-        while(_mesh->n_edges() > finalEgdeCount){
-            collapseEdge(_mesh, getSmallestEdge(_mesh));
+    edgeList.sort();
+    list<Dual>::iterator it;
+    while(_mesh->n_edges() > finalEgdeCount)
+    {
+        if(i%1000 == 0) t1 = clock();
+        it = edgeList.begin();
+        while(collapseEdge(&mesh, it->id)==0)
+        {
+            it++;
         }
-    }
-    else if(method == "Par angle"){
-
-        while(_mesh->n_edges() > finalEgdeCount){
-            collapseEdge(_mesh, getSmallestAngle(_mesh));
+        edgeList.erase(it,it);
+        i++;
+        if(i%1000 == 999)
+        {
+            t2 = clock();
+            cout << _mesh->n_edges() << "/" << finalEgdeCount << " (" << static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC) << "s since last update)" << endl;
         }
-
-    }
-    else if(method == "Par planéité"){
-        while(_mesh->n_edges() > finalEgdeCount){
-            collapseEdge(_mesh, getSmallestPlan(_mesh));
-        }
-    } else if (method == "Personnalisé"){
-        while(_mesh->n_edges() > finalEgdeCount){
-            collapseEdge(_mesh, getSmallestRatio(_mesh));
-        }
-    }else if (method == "Personnalisé2"){
-        while(_mesh->n_edges() > finalEgdeCount){
-            collapseEdge(_mesh, getSmallestEdgeFace(_mesh));
-        }
-    }
-    else {
-        qDebug() << "Méthode inconnue !!!";
     }
 }
-
-// LE PLUS OPTI EST DE REGARDER PLANEITE ET LA TAILLE
 
 /* **** début de la partie boutons et IHM **** */
 void MainWindow::updateEdgeSelectionIHM()
@@ -724,7 +738,7 @@ void MainWindow::on_pushButton_chargement_clicked()
 
 void MainWindow::on_pushButton_decimate_clicked()
 {
-    decimation(&mesh, ui->horizontalSlider->value(), ui->comboBox->currentText());
+//    decimation(&mesh, ui->horizontalSlider->value(), ui->comboBox->currentText());
     displayMesh(&mesh);
 }
 /* **** fin de la partie boutons et IHM **** */
@@ -960,7 +974,13 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_pushButton_2_clicked()
 {
+    ui->saliencyProgressBar->setValue(0);
     saliency(&mesh);
-    //decimation(&mesh);
+    //decimation(&mesh, 1);
     displayMesh(&mesh,true);
+}
+
+void MainWindow::on_saliencyProgressBar_valueChanged(int value)
+{
+    if(value == 100){}
 }

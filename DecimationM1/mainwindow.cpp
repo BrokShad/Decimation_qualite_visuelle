@@ -63,7 +63,7 @@ void MainWindow::initData(MyMesh *_mesh)
         cellX = (_mesh->point(*vit)[0]-Xmin)/cellSizex;
         cellY = (_mesh->point(*vit)[1]-Ymin)/cellSizey;
         cellZ = (_mesh->point(*vit)[2]-Zmin)/cellSizez;
-        cout << "Point " << vit->idx() << " ("<< _mesh->point(*vit)[0] << "," << _mesh->point(*vit)[1] << "," << _mesh->point(*vit)[2] << ") at cell " << cellX << ", " << cellY << ", " << cellZ << endl;
+//        cout << "Point " << vit->idx() << " ("<< _mesh->point(*vit)[0] << "," << _mesh->point(*vit)[1] << "," << _mesh->point(*vit)[2] << ") at cell " << cellX << ", " << cellY << ", " << cellZ << endl;
 //        getchar();
         cluster[cellX][cellY][cellZ].push_back(_mesh->point(*vit));
     }

@@ -8,6 +8,9 @@
 #include <QProgressDialog>
 #include <cstdlib>
 #include <QVector>
+#include <QtConcurrent/QtConcurrent>
+#include <QFutureWatcher>
+#include <QFuture>
 #include <math.h>
 
 #include <stdlib.h>
@@ -20,8 +23,6 @@
 #include <cmath>
 
 #include "threadpool.h"
-
-#define TAB_SIZE 70
 
 namespace Ui {
 class MainWindow;
@@ -106,21 +107,24 @@ public:
     QVector<MyMesh::Point> rangeSearch(MyMesh *_mesh, int pid, float range);
     void saliency(MyMesh *_mesh);
     void initData(MyMesh *_mesh);
-    void Neighbourhood(MyMesh *_mesh);
+
 private slots:
 
     void on_pushButton_chargement_clicked();
-    void on_pushButton_edgeMoins_clicked();
-    void on_pushButton_edgePlus_clicked();
-    void on_pushButton_delSelEdge_clicked();
-
-    void on_pushButton_decimate_clicked();
-
-    void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
 
     void on_saliencyProgressBar_valueChanged(int value);
+
+    void on_decimationComboBox_currentIndexChanged(int index);
+
+    void on_pushButton_3_clicked();
+
+    void on_decimationProgressBar_valueChanged(int value);
+
+    void on_pushButton_4_clicked();
+
+    void on_checkBox_stateChanged(int arg1);
 
 private:
 
@@ -142,16 +146,20 @@ private:
     float cellSizey;
     float cellSizez;
     float diagBoundBox;
+    int TAB_SIZE;
 
 //    array<array<array<vector<MyMesh::Point>, TAB_SIZE>, TAB_SIZE>, TAB_SIZE> cluster;
     vector<MyMesh::Point> ***cluster;
 
     bool modevoisinage;
 
+    bool liveDisplay;
+
     MyMesh mesh;
     int vertexSelection;
     int edgeSelection;
     int faceSelection;
+    int decimationOptionIndex;
 
     Ui::MainWindow *ui;
 };

@@ -12,6 +12,8 @@ void MainWindow::initData(MyMesh *_mesh)
 {
     //Génération de l'espace de clusters
     cout << "Attribution..." << endl;
+    TAB_SIZE = pow(log10(mesh.n_vertices()),2)*2;
+    cout << "Cluster size is " << TAB_SIZE << "³" << endl;
     cluster = new vector<MyMesh::Point>**[TAB_SIZE];
     for(int i=0; i<TAB_SIZE; i++)
     {
@@ -134,37 +136,6 @@ QVector<MyMesh::Point> MainWindow::rangeSearch(MyMesh *_mesh, int pid, float ran
         return inRange;
 }
 
-//void MainWindow::Neighbourhood(MyMesh *_mesh)
-//{
-//    unsigned int i;
-
-//    //Calcul des dimensions virtuelles des clusters
-//    cout << "Calculating clusters size..." << endl;
-//    initData(&mesh);
-//    cout << cellSizex << ", " << cellSizey << ", " << cellSizez << endl;
-
-//    clock_t t1, t2;
-//    //Recherche
-//    t1 = clock();
-//    for(i = 0; i<_mesh->n_vertices(); i++)
-//    {
-//        if(i%1000==0)
-//        {
-//            cout << i << "/" << POINTS_POOL << endl;
-//        }
-//        rangeSearch(&mesh, i, diagBoundBox*0.003);
-//        rangeSearch(&mesh, i, diagBoundBox*0.006);
-//        rangeSearch(&mesh, i, diagBoundBox*0.009);
-//        rangeSearch(&mesh, i, diagBoundBox*0.012);
-//        rangeSearch(&mesh, i, diagBoundBox*0.015);
-//        rangeSearch(&mesh, i, diagBoundBox*0.018);
-//    }
-//    t2 = clock();
-//    cout << " (" << static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC) << "s)" << endl;
-
-//    cout << "Done." << endl;
-
-//}
 
 void MainWindow::H_Curv(MyMesh* _mesh)
 {
@@ -238,13 +209,16 @@ void MainWindow::saliency(MyMesh* _mesh){
     initData(&mesh);
     clock_t t1, t2;
     int i = 0;
-//    int progress;
+    int progress;
 //    ThreadPool tp(std::thread::hardware_concurrency());
 //    cout << "Threads: " << std::thread::hardware_concurrency() << endl;
     for (MyMesh::VertexIter vit = _mesh->vertices_begin(); vit != _mesh->vertices_end(); ++vit)
     {
-//        progress = (int)(i/mesh.n_vertices()*100);
-//        if(progress > ui->saliencyProgressBar->value()) ui->saliencyProgressBar->setValue(progress);
+        progress = (int)((float)i/mesh.n_vertices()*100);
+        if(progress > ui->saliencyProgressBar->value())
+        {
+            ui->saliencyProgressBar->setValue(progress);
+        }
         if(i%1000 == 0) t1 = clock();
 //        tp.enqueue([&](MyMesh* m, VertexHandle v){vertexThreading(m, v);}, &mesh, *vit);
 //        async(launch::async, [&](MyMesh *m, VertexHandle v){return vertexThreading(m, v);}, &mesh, *vit);
@@ -256,6 +230,7 @@ void MainWindow::saliency(MyMesh* _mesh){
         }
         i++;
     }
+    ui->saliencyProgressBar->setValue(100);
 
 }
 
@@ -675,52 +650,14 @@ void MainWindow::decimation(MyMesh* _mesh, int percent)
     }
 }
 
-/* **** début de la partie boutons et IHM **** */
-void MainWindow::updateEdgeSelectionIHM()
-{
-    /* **** à compléter ! (Partie 3) ****
-     * Cette fonction met à jour l'interface, les critères pourrons être affichés dans la zone de texte pour les vérifier
-     */
-
-    QString infos = "";
-    infos = infos + "Surface : " + QString::number(0) + "\n";
-    infos = infos + "C1 : " + QString::number(0) + "\n";
-    infos = infos + "C2 : " + QString::number(0) + "\n";
-    infos = infos + "C3 : " + QString::number(0) + "\n";
-    ui->infoEdgeSelection->setPlainText(infos);
-
-    ui->labelEdge->setText(QString::number(edgeSelection));
-
-    // on montre la nouvelle sélection
-    showEdgeSelection(&mesh);
-}
-/* **** fin de la partie à compléter **** */
-
-void MainWindow::on_pushButton_edgeMoins_clicked()
-{
-    // mise à jour de l'interface
-    edgeSelection = edgeSelection - 1;
-    updateEdgeSelectionIHM();
-}
-
-void MainWindow::on_pushButton_edgePlus_clicked()
-{
-    // mise à jour de l'interface
-    edgeSelection = edgeSelection + 1;
-    updateEdgeSelectionIHM();
-}
-
-void MainWindow::on_pushButton_delSelEdge_clicked()
-{
-    // on supprime l'arête d'indice edgeSelection
-    collapseEdge(&mesh, edgeSelection);
-
-    // on actualise la sélection
-    showEdgeSelection(&mesh);
-}
+//* **** début de la partie boutons et IHM **** *//
 
 void MainWindow::on_pushButton_chargement_clicked()
 {
+    ui->pushButton_2->setEnabled(false);
+    ui->pushButton_3->setEnabled(false);
+    ui->pushButton_4->setEnabled(false);
+
     // fenêtre de sélection des fichiers
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
 
@@ -734,14 +671,9 @@ void MainWindow::on_pushButton_chargement_clicked()
 
     // on affiche le maillage
     displayMesh(&mesh);
-}
 
-void MainWindow::on_pushButton_decimate_clicked()
-{
-//    decimation(&mesh, ui->horizontalSlider->value(), ui->comboBox->currentText());
-    displayMesh(&mesh);
+    ui->pushButton_2->setEnabled(true);
 }
-/* **** fin de la partie boutons et IHM **** */
 
 
 
@@ -959,6 +891,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     modevoisinage = false;
 
     ui->setupUi(this);
+
+    ui->saliencyProgressBar->setRange(0, 100);
+    ui->decimationProgressBar->setRange(0, 100);
+
+    ui->checkBox->setEnabled(true);
+    ui->pushButton_2->setEnabled(false);
+    ui->pushButton_3->setEnabled(false);
+    ui->pushButton_4->setEnabled(false);
+
+    const QStringList optionList = {"Aspect Ratio","Edge Length","Hausdorff","Independant Sets","Normal Deviation","Normal Flipping","Prog Mesh","Quadric","Roundness"};
+    ui->decimationComboBox->addItems(optionList);
+
 }
 
 MainWindow::~MainWindow()
@@ -966,21 +910,60 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_clicked()
-{
-    H_Curv(&mesh);
-    displayMesh(&mesh);
-}
-
 void MainWindow::on_pushButton_2_clicked()
 {
+    ui->checkBox->setEnabled(false);
     ui->saliencyProgressBar->setValue(0);
-    saliency(&mesh);
-    //decimation(&mesh, 1);
-    displayMesh(&mesh,true);
+    QtConcurrent::run([&](MyMesh* _mesh){saliency(&mesh);}, &mesh);
 }
 
 void MainWindow::on_saliencyProgressBar_valueChanged(int value)
 {
-    if(value == 100){}
+    if(value%2 == 0 && liveDisplay)
+    {
+        displayMesh(&mesh,true);
+    }
+    if(value == 100)
+    {
+        if(!liveDisplay) displayMesh(&mesh,true);
+        ui->checkBox->setEnabled(true);
+        ui->pushButton_3->setEnabled(true);
+    }
+}
+
+void MainWindow::on_decimationComboBox_currentIndexChanged(int index)
+{
+    decimationOptionIndex = index;
+}
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    ui->checkBox->setEnabled(false);
+    //decimate with decimateOptionIndex
+    //decimate(&mesh, percent);
+}
+
+void MainWindow::on_decimationProgressBar_valueChanged(int value)
+{
+    if(value%2 == 0 && liveDisplay)
+    {
+        displayMesh(&mesh,true);
+    }
+    if(value == 100)
+    {
+        if(!liveDisplay) displayMesh(&mesh,true);
+        ui->checkBox->setEnabled(true);
+        ui->pushButton_4->setEnabled(true);
+    }
+}
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    //sauvegarde
+}
+
+void MainWindow::on_checkBox_stateChanged(int arg1)
+{
+    liveDisplay = arg1;
+    cout << "Live display = " << arg1 << endl;
 }

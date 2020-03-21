@@ -13,17 +13,15 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QSlider>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
@@ -40,32 +38,20 @@ public:
     QHBoxLayout *horizontalLayout;
     QWidget *widget_2;
     QVBoxLayout *verticalLayout;
+    QLabel *label_3;
     QPushButton *pushButton_chargement;
-    QFrame *frame;
-    QVBoxLayout *verticalLayout_3;
-    QWidget *widget_3;
-    QHBoxLayout *horizontalLayout_3;
-    QLabel *label_5;
-    QPushButton *pushButton_edgeMoins;
-    QLabel *labelEdge;
-    QPushButton *pushButton_edgePlus;
-    QPlainTextEdit *infoEdgeSelection;
-    QPushButton *pushButton_delSelEdge;
-    QFrame *frame_2;
-    QVBoxLayout *verticalLayout_2;
-    QWidget *widget;
-    QHBoxLayout *horizontalLayout_2;
-    QLabel *label;
-    QComboBox *comboBox;
-    QWidget *widget_4;
-    QHBoxLayout *horizontalLayout_4;
-    QLabel *label_2;
-    QSlider *horizontalSlider;
-    QPushButton *pushButton_decimate;
-    QPushButton *pushButton;
+    QLabel *label_4;
     QPushButton *pushButton_2;
     QProgressBar *saliencyProgressBar;
+    QLabel *label_6;
+    QComboBox *decimationComboBox;
+    QLabel *label_7;
+    QPushButton *pushButton_3;
+    QProgressBar *decimationProgressBar;
+    QLabel *label_8;
+    QPushButton *pushButton_4;
     QSpacerItem *verticalSpacer;
+    QCheckBox *checkBox;
     MeshViewerWidget *displayWidget;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
@@ -75,7 +61,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(632, 408);
+        MainWindow->resize(833, 437);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         horizontalLayout = new QHBoxLayout(centralWidget);
@@ -95,161 +81,21 @@ public:
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
         verticalLayout->setContentsMargins(3, 3, 3, 3);
+        label_3 = new QLabel(widget_2);
+        label_3->setObjectName(QStringLiteral("label_3"));
+
+        verticalLayout->addWidget(label_3);
+
         pushButton_chargement = new QPushButton(widget_2);
         pushButton_chargement->setObjectName(QStringLiteral("pushButton_chargement"));
         pushButton_chargement->setMinimumSize(QSize(200, 0));
 
         verticalLayout->addWidget(pushButton_chargement);
 
-        frame = new QFrame(widget_2);
-        frame->setObjectName(QStringLiteral("frame"));
-        frame->setFrameShape(QFrame::StyledPanel);
-        frame->setFrameShadow(QFrame::Raised);
-        verticalLayout_3 = new QVBoxLayout(frame);
-        verticalLayout_3->setSpacing(1);
-        verticalLayout_3->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_3->setObjectName(QStringLiteral("verticalLayout_3"));
-        verticalLayout_3->setContentsMargins(1, 1, 1, 1);
-        widget_3 = new QWidget(frame);
-        widget_3->setObjectName(QStringLiteral("widget_3"));
-        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy1.setHorizontalStretch(0);
-        sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(widget_3->sizePolicy().hasHeightForWidth());
-        widget_3->setSizePolicy(sizePolicy1);
-        horizontalLayout_3 = new QHBoxLayout(widget_3);
-        horizontalLayout_3->setSpacing(1);
-        horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        horizontalLayout_3->setContentsMargins(1, 1, 1, 1);
-        label_5 = new QLabel(widget_3);
-        label_5->setObjectName(QStringLiteral("label_5"));
-        QSizePolicy sizePolicy2(QSizePolicy::Maximum, QSizePolicy::Preferred);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
-        label_5->setSizePolicy(sizePolicy2);
+        label_4 = new QLabel(widget_2);
+        label_4->setObjectName(QStringLiteral("label_4"));
 
-        horizontalLayout_3->addWidget(label_5);
-
-        pushButton_edgeMoins = new QPushButton(widget_3);
-        pushButton_edgeMoins->setObjectName(QStringLiteral("pushButton_edgeMoins"));
-        QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Fixed);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(0);
-        sizePolicy3.setHeightForWidth(pushButton_edgeMoins->sizePolicy().hasHeightForWidth());
-        pushButton_edgeMoins->setSizePolicy(sizePolicy3);
-
-        horizontalLayout_3->addWidget(pushButton_edgeMoins);
-
-        labelEdge = new QLabel(widget_3);
-        labelEdge->setObjectName(QStringLiteral("labelEdge"));
-        sizePolicy1.setHeightForWidth(labelEdge->sizePolicy().hasHeightForWidth());
-        labelEdge->setSizePolicy(sizePolicy1);
-        labelEdge->setAlignment(Qt::AlignCenter);
-
-        horizontalLayout_3->addWidget(labelEdge);
-
-        pushButton_edgePlus = new QPushButton(widget_3);
-        pushButton_edgePlus->setObjectName(QStringLiteral("pushButton_edgePlus"));
-        sizePolicy3.setHeightForWidth(pushButton_edgePlus->sizePolicy().hasHeightForWidth());
-        pushButton_edgePlus->setSizePolicy(sizePolicy3);
-        pushButton_edgePlus->setMinimumSize(QSize(10, 0));
-
-        horizontalLayout_3->addWidget(pushButton_edgePlus);
-
-
-        verticalLayout_3->addWidget(widget_3);
-
-        infoEdgeSelection = new QPlainTextEdit(frame);
-        infoEdgeSelection->setObjectName(QStringLiteral("infoEdgeSelection"));
-        QSizePolicy sizePolicy4(QSizePolicy::Expanding, QSizePolicy::Maximum);
-        sizePolicy4.setHorizontalStretch(0);
-        sizePolicy4.setVerticalStretch(0);
-        sizePolicy4.setHeightForWidth(infoEdgeSelection->sizePolicy().hasHeightForWidth());
-        infoEdgeSelection->setSizePolicy(sizePolicy4);
-        infoEdgeSelection->setMaximumSize(QSize(200, 70));
-        infoEdgeSelection->setStyleSheet(QStringLiteral("font: 11pt \"Lucida Console\";"));
-
-        verticalLayout_3->addWidget(infoEdgeSelection);
-
-        pushButton_delSelEdge = new QPushButton(frame);
-        pushButton_delSelEdge->setObjectName(QStringLiteral("pushButton_delSelEdge"));
-
-        verticalLayout_3->addWidget(pushButton_delSelEdge);
-
-
-        verticalLayout->addWidget(frame);
-
-        frame_2 = new QFrame(widget_2);
-        frame_2->setObjectName(QStringLiteral("frame_2"));
-        frame_2->setFrameShape(QFrame::StyledPanel);
-        frame_2->setFrameShadow(QFrame::Raised);
-        verticalLayout_2 = new QVBoxLayout(frame_2);
-        verticalLayout_2->setSpacing(1);
-        verticalLayout_2->setContentsMargins(11, 11, 11, 11);
-        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
-        verticalLayout_2->setContentsMargins(1, 3, 1, 1);
-        widget = new QWidget(frame_2);
-        widget->setObjectName(QStringLiteral("widget"));
-        horizontalLayout_2 = new QHBoxLayout(widget);
-        horizontalLayout_2->setSpacing(1);
-        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        horizontalLayout_2->setContentsMargins(1, 1, 1, 1);
-        label = new QLabel(widget);
-        label->setObjectName(QStringLiteral("label"));
-        QSizePolicy sizePolicy5(QSizePolicy::Maximum, QSizePolicy::Maximum);
-        sizePolicy5.setHorizontalStretch(0);
-        sizePolicy5.setVerticalStretch(0);
-        sizePolicy5.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-        label->setSizePolicy(sizePolicy5);
-
-        horizontalLayout_2->addWidget(label);
-
-        comboBox = new QComboBox(widget);
-        comboBox->setObjectName(QStringLiteral("comboBox"));
-
-        horizontalLayout_2->addWidget(comboBox);
-
-
-        verticalLayout_2->addWidget(widget);
-
-        widget_4 = new QWidget(frame_2);
-        widget_4->setObjectName(QStringLiteral("widget_4"));
-        horizontalLayout_4 = new QHBoxLayout(widget_4);
-        horizontalLayout_4->setSpacing(1);
-        horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
-        horizontalLayout_4->setContentsMargins(1, 1, 1, 1);
-        label_2 = new QLabel(widget_4);
-        label_2->setObjectName(QStringLiteral("label_2"));
-
-        horizontalLayout_4->addWidget(label_2);
-
-        horizontalSlider = new QSlider(widget_4);
-        horizontalSlider->setObjectName(QStringLiteral("horizontalSlider"));
-        horizontalSlider->setMinimum(1);
-        horizontalSlider->setValue(50);
-        horizontalSlider->setOrientation(Qt::Horizontal);
-
-        horizontalLayout_4->addWidget(horizontalSlider);
-
-
-        verticalLayout_2->addWidget(widget_4);
-
-        pushButton_decimate = new QPushButton(frame_2);
-        pushButton_decimate->setObjectName(QStringLiteral("pushButton_decimate"));
-
-        verticalLayout_2->addWidget(pushButton_decimate);
-
-
-        verticalLayout->addWidget(frame_2);
-
-        pushButton = new QPushButton(widget_2);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-
-        verticalLayout->addWidget(pushButton);
+        verticalLayout->addWidget(label_4);
 
         pushButton_2 = new QPushButton(widget_2);
         pushButton_2->setObjectName(QStringLiteral("pushButton_2"));
@@ -263,9 +109,50 @@ public:
 
         verticalLayout->addWidget(saliencyProgressBar);
 
+        label_6 = new QLabel(widget_2);
+        label_6->setObjectName(QStringLiteral("label_6"));
+
+        verticalLayout->addWidget(label_6);
+
+        decimationComboBox = new QComboBox(widget_2);
+        decimationComboBox->setObjectName(QStringLiteral("decimationComboBox"));
+
+        verticalLayout->addWidget(decimationComboBox);
+
+        label_7 = new QLabel(widget_2);
+        label_7->setObjectName(QStringLiteral("label_7"));
+
+        verticalLayout->addWidget(label_7);
+
+        pushButton_3 = new QPushButton(widget_2);
+        pushButton_3->setObjectName(QStringLiteral("pushButton_3"));
+
+        verticalLayout->addWidget(pushButton_3);
+
+        decimationProgressBar = new QProgressBar(widget_2);
+        decimationProgressBar->setObjectName(QStringLiteral("decimationProgressBar"));
+        decimationProgressBar->setValue(0);
+
+        verticalLayout->addWidget(decimationProgressBar);
+
+        label_8 = new QLabel(widget_2);
+        label_8->setObjectName(QStringLiteral("label_8"));
+
+        verticalLayout->addWidget(label_8);
+
+        pushButton_4 = new QPushButton(widget_2);
+        pushButton_4->setObjectName(QStringLiteral("pushButton_4"));
+
+        verticalLayout->addWidget(pushButton_4);
+
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout->addItem(verticalSpacer);
+
+        checkBox = new QCheckBox(widget_2);
+        checkBox->setObjectName(QStringLiteral("checkBox"));
+
+        verticalLayout->addWidget(checkBox);
 
 
         horizontalLayout->addWidget(widget_2);
@@ -278,7 +165,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 632, 22));
+        menuBar->setGeometry(QRect(0, 0, 833, 22));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -295,31 +182,16 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", Q_NULLPTR));
-        pushButton_chargement->setText(QApplication::translate("MainWindow", "Charger OBJ", Q_NULLPTR));
-        label_5->setText(QApplication::translate("MainWindow", "e : ", Q_NULLPTR));
-        pushButton_edgeMoins->setText(QApplication::translate("MainWindow", "-", Q_NULLPTR));
-        labelEdge->setText(QApplication::translate("MainWindow", "-1", Q_NULLPTR));
-        pushButton_edgePlus->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
-        infoEdgeSelection->setPlainText(QApplication::translate("MainWindow", "Surface :\n"
-"C1 : \n"
-"C2 : \n"
-"C3 :", Q_NULLPTR));
-        pushButton_delSelEdge->setText(QApplication::translate("MainWindow", "Supprimer l'ar\303\252te", Q_NULLPTR));
-        label->setText(QApplication::translate("MainWindow", "Crit\303\250re : ", Q_NULLPTR));
-        comboBox->clear();
-        comboBox->insertItems(0, QStringList()
-         << QApplication::translate("MainWindow", "Al\303\251atoire", Q_NULLPTR)
-         << QApplication::translate("MainWindow", "Erreur quadrique", Q_NULLPTR)
-         << QApplication::translate("MainWindow", "Par taille", Q_NULLPTR)
-         << QApplication::translate("MainWindow", "Par angle", Q_NULLPTR)
-         << QApplication::translate("MainWindow", "Par plan\303\251it\303\251", Q_NULLPTR)
-         << QApplication::translate("MainWindow", "Personnalis\303\251", Q_NULLPTR)
-         << QApplication::translate("MainWindow", "Personnalis\303\2512", Q_NULLPTR)
-        );
-        label_2->setText(QApplication::translate("MainWindow", "% : ", Q_NULLPTR));
-        pushButton_decimate->setText(QApplication::translate("MainWindow", "Simplifier avec le crit\303\250re", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("MainWindow", "Courbure", Q_NULLPTR));
+        label_3->setText(QApplication::translate("MainWindow", "Load a mesh", Q_NULLPTR));
+        pushButton_chargement->setText(QApplication::translate("MainWindow", "Load Mesh", Q_NULLPTR));
+        label_4->setText(QApplication::translate("MainWindow", "Launch the calculation", Q_NULLPTR));
         pushButton_2->setText(QApplication::translate("MainWindow", "Saliency", Q_NULLPTR));
+        label_6->setText(QApplication::translate("MainWindow", "Choose a method of decimation", Q_NULLPTR));
+        label_7->setText(QApplication::translate("MainWindow", "Launch decimation", Q_NULLPTR));
+        pushButton_3->setText(QApplication::translate("MainWindow", "Decimate (NON FUNCTIONNAL)", Q_NULLPTR));
+        label_8->setText(QApplication::translate("MainWindow", "Save the result.", Q_NULLPTR));
+        pushButton_4->setText(QApplication::translate("MainWindow", "Export (NON FUNCTIONNAL)", Q_NULLPTR));
+        checkBox->setText(QApplication::translate("MainWindow", "Live Display (Can slow the process)", Q_NULLPTR));
     } // retranslateUi
 
 };

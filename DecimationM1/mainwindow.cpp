@@ -208,7 +208,7 @@ void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v){
     QVector<MyMesh::Point> N6 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.018);
     QVector<MyMesh::Point> N7 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.024);
     QVector<MyMesh::Point> N8 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.030);
-    QVector<MyMesh::Point> N9 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.036);
+//    QVector<MyMesh::Point> N9 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.036);
 //        cout << N.size() << " N size" << endl;
     float delta1 = GWAMC(_mesh,diagBoundBox*0.003,N1,v);
     float delta2 = GWAMC(_mesh,diagBoundBox*0.006,N2,v);
@@ -218,11 +218,11 @@ void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v){
     float delta6 = GWAMC(_mesh,diagBoundBox*0.018,N6,v);
     float delta7 = GWAMC(_mesh,diagBoundBox*0.024,N7,v);
     float delta8 = GWAMC(_mesh,diagBoundBox*0.030,N8,v);
-    float delta9 = GWAMC(_mesh,diagBoundBox*0.036,N9,v);
+//    float delta9 = GWAMC(_mesh,diagBoundBox*0.036,N9,v);
 //        cout << delta1 << ',' << delta2 << endl;
 //        if (delta1 != delta2)
 //            cout << delta1 << " " << delta2 << " saliency "<< endl;
-    _mesh->data(v).value = (abs(delta1-delta2)+abs(delta2-delta4)+abs(delta3-delta6)+abs(delta4-delta7)+abs(delta5-delta8)+abs(delta6-delta9))/6;
+    _mesh->data(v).value = (abs(delta1-delta2)+abs(delta2-delta4)+abs(delta3-delta6)+abs(delta4-delta7)+abs(delta5-delta8)/*+abs(delta6-delta9)*/)/5;
     N1.clear();
     N2.clear();
     N3.clear();
@@ -231,12 +231,13 @@ void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v){
     N6.clear();
     N7.clear();
     N8.clear();
-    N9.clear();
+//    N9.clear();
 }
 
 void MainWindow::saliency(MyMesh* _mesh){
     initData(&mesh);
     int i = 0;
+    float meanTime = 0;
     clock_t t1, t2;
     for (MyMesh::VertexIter vit = _mesh->vertices_begin(); vit != _mesh->vertices_end(); ++vit)
     {
@@ -246,7 +247,9 @@ void MainWindow::saliency(MyMesh* _mesh){
         {
             cout << i << "/" << _mesh->n_vertices() << endl;
             t2 = clock();
-            cout << "RS (" << static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC) << "s)" << endl;
+            meanTime += static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC);
+            cout << "actual Time (" << static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC) << endl;
+            cout << "mean Time (" << meanTime/(i/1000) << "s)" << endl;
         }
         i++;
     }

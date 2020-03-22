@@ -5,6 +5,16 @@
 #include <QMainWindow>
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
+#include <OpenMesh/Tools/Decimater/DecimaterT.hh>
+#include <OpenMesh/Tools/Decimater/ModAspectRatioT.hh>
+#include <OpenMesh/Tools/Decimater/ModEdgeLengthT.hh>
+#include <OpenMesh/Tools/Decimater/ModHausdorffT.hh>
+#include <OpenMesh/Tools/Decimater/ModIndependentSetsT.hh>
+#include <OpenMesh/Tools/Decimater/ModNormalDeviationT.hh>
+#include <OpenMesh/Tools/Decimater/ModNormalFlippingT.hh>
+#include <OpenMesh/Tools/Decimater/ModProgMeshT.hh>
+#include <OpenMesh/Tools/Decimater/ModQuadricT.hh>
+#include <OpenMesh/Tools/Decimater/ModRoundnessT.hh>
 #include <QProgressDialog>
 #include <cstdlib>
 #include <QVector>
@@ -101,10 +111,10 @@ public:
     float calculateCurveOnVertex(MyMesh *_mesh, int vertexID);
     void H_Curv(MyMesh *_mesh);
     void vertexThreading(MyMesh* _mesh, VertexHandle v);
-    float GWAMC(MyMesh *_mesh, float delta, QVector<MyMesh::Point> N, VertexHandle X);
+    float GWAMC(MyMesh *_mesh, float delta, int Nid, VertexHandle X);
 
     float *Curvature;
-    QVector<MyMesh::Point> rangeSearch(MyMesh *_mesh, int pid, float range);
+    void rangeSearch(MyMesh *_mesh, int pid, float range);
     void saliency(MyMesh *_mesh);
     void initData(MyMesh *_mesh);
 
@@ -147,9 +157,15 @@ private:
     float cellSizez;
     float diagBoundBox;
     int TAB_SIZE;
+    float maxSaliency;
+    float minSaliency;
 
 //    array<array<array<vector<MyMesh::Point>, TAB_SIZE>, TAB_SIZE>, TAB_SIZE> cluster;
     vector<MyMesh::Point> ***cluster;
+    vector<MyMesh::Point> *N;
+    vector<float> delta;
+    vector<float> top;
+    vector<float> bot;
 
     bool modevoisinage;
 

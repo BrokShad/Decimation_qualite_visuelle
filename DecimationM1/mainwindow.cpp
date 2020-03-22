@@ -14,6 +14,9 @@ void MainWindow::initData(MyMesh *_mesh)
     cout << "Attribution..." << endl;
     TAB_SIZE = pow(log10(mesh.n_vertices()),2)*2;
     cout << "Cluster size is " << TAB_SIZE << "³" << endl;
+
+    N = new vector<MyMesh::Point>[8];
+
     cluster = new vector<MyMesh::Point>**[TAB_SIZE];
     for(int i=0; i<TAB_SIZE; i++)
     {
@@ -70,13 +73,13 @@ void MainWindow::initData(MyMesh *_mesh)
         cluster[cellX][cellY][cellZ].push_back(_mesh->point(*vit));
     }
 
+
     H_Curv(_mesh);
 //    cout << "TESSSSSSSSST" << endl;
 }
 
-QVector<MyMesh::Point> MainWindow::rangeSearch(MyMesh *_mesh, int pid, float range)
+void MainWindow::rangeSearch(MyMesh *_mesh, int pid, float range)
 {
-        QVector<MyMesh::Point> inRange;
         MyMesh::Point p = _mesh->point(_mesh->vertex_handle(pid));
         int pidCellX = (p[0]-Xmin)/cellSizex;
         int pidCellY = (p[1]-Ymin)/cellSizey;
@@ -113,7 +116,7 @@ QVector<MyMesh::Point> MainWindow::rangeSearch(MyMesh *_mesh, int pid, float ran
         int beginZ = pidCellZ-cellNegZRange;
         if(beginZ<0) beginZ = 0;
 
-        int x,y,z;
+        int x,y,z,i,j;
         vector<MyMesh::Point>::iterator it;
         for(x = beginX; x<=pidCellX+cellPosXRange && x<TAB_SIZE; x++)
             for(y = beginY; y<=pidCellY+cellPosYRange && y<TAB_SIZE; y++)
@@ -125,15 +128,18 @@ QVector<MyMesh::Point> MainWindow::rangeSearch(MyMesh *_mesh, int pid, float ran
                         //cout << it->id << endl;
                         float distance = sqrt(pow(p[0]-(*it)[0],2)+pow(p[1]-(*it)[1],2)+pow(p[2]-(*it)[2],2));
                         //cout << "Point " << it->id << " is at " << distance << " from " << pid << endl;
-                        if(distance<=range && distance != 0){
-//                            cout << "New point added (distance is " << distance << ")" << endl;
-                            inRange.push_back(*it);
-                        }
+                        i=8;
+                        if(distance<=0.003) i = 0;
+                        else if(distance<=0.006) i = 1;
+                        else if(distance<=0.009) i = 2;
+                        else if(distance<=0.012) i = 3;
+                        else if(distance<=0.015) i = 4;
+                        else if(distance<=0.018) i = 5;
+                        else if(distance<=0.024) i = 6;
+                        else if(distance<=0.030) i = 7;
+                        N[i].push_back(*it);
                     }
                 }
-//        cout << inRange.size() << " in range (" << range << ")" << endl;
-//        exit(0);
-        return inRange;
 }
 
 
@@ -151,17 +157,21 @@ void MainWindow::H_Curv(MyMesh* _mesh)
     }
 }
 
-float MainWindow::GWAMC(MyMesh* _mesh, float delta, QVector<MyMesh::Point> N, VertexHandle X){
+float MainWindow::GWAMC(MyMesh* _mesh, float delta, int Nid, VertexHandle X){
 //    float GWA[_mesh->n_vertices()];
     int id = X.idx();
     MyMesh::Point Xp = _mesh->point(_mesh->vertex_handle(id));
     float top = 0;
     float bot = 0;
 //    cout << Curvature[id] << endl;
-    for (int i = 0; i < N.size(); ++i) {
-        top += Curvature[id] * exp (-(norm(Xp-N.at(i))*norm(Xp-N.at(i)))/(2*delta*delta));
-//        cout << "Curvature[id] * exp ((norm(Xp-N.at(i))*norm(Xp-N.at(i)))/2*delta*delta)" << endl;
-        bot += exp (-(norm(Xp-N.at(i))*norm(Xp-N.at(i)))/(2*delta*delta));
+    for (int j = Nid; j >= 0; --j)
+    {
+        for (int i = 0; i < N[j].size(); ++i)
+        {
+            top += Curvature[id] * exp (-(norm(Xp-N[j].at(i))*norm(Xp-N[j].at(i)))/(2*delta*delta));
+    //        cout << "Curvature[id] * exp ((norm(Xp-N.at(i))*norm(Xp-N.at(i)))/2*delta*delta)" << endl;
+            bot += exp (-(norm(Xp-N[j].at(i))*norm(Xp-N[j].at(i)))/(2*delta*delta));
+        }
     }
 //    cout << Curvature[id] << " curvature " << endl;
 //    cout << " valeur bot et top sommet " << id << " : " << top << "/" << bot << endl;
@@ -170,39 +180,29 @@ float MainWindow::GWAMC(MyMesh* _mesh, float delta, QVector<MyMesh::Point> N, Ve
     return top/bot;
 }
 
-void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v){
-    QVector<MyMesh::Point> N1 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.003);
-    QVector<MyMesh::Point> N2 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.006);
-    QVector<MyMesh::Point> N3 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.009);
-    QVector<MyMesh::Point> N4 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.012);
-    QVector<MyMesh::Point> N5 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.015);
-    QVector<MyMesh::Point> N6 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.018);
-    QVector<MyMesh::Point> N7 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.024);
-    QVector<MyMesh::Point> N8 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.030);
-//    QVector<MyMesh::Point> N9 = rangeSearch(&mesh, v.idx(), diagBoundBox*0.036);
-//        cout << N.size() << " N size" << endl;
-    float delta1 = GWAMC(_mesh,diagBoundBox*0.003,N1,v);
-    float delta2 = GWAMC(_mesh,diagBoundBox*0.006,N2,v);
-    float delta3 = GWAMC(_mesh,diagBoundBox*0.009,N3,v);
-    float delta4 = GWAMC(_mesh,diagBoundBox*0.012,N4,v);
-    float delta5 = GWAMC(_mesh,diagBoundBox*0.015,N5,v);
-    float delta6 = GWAMC(_mesh,diagBoundBox*0.018,N6,v);
-    float delta7 = GWAMC(_mesh,diagBoundBox*0.024,N7,v);
-    float delta8 = GWAMC(_mesh,diagBoundBox*0.030,N8,v);
-//    float delta9 = GWAMC(_mesh,diagBoundBox*0.036,N9,v);
-//        cout << delta1 << ',' << delta2 << endl;
+void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v)
+{
+    rangeSearch(&mesh, v.idx(), diagBoundBox*0.030);
+//    cout << N[0].size() << ", " << N[1].size() << ", " << N[2].size() << ", " << N[3].size() << ", " << N[4].size() << ", " << N[5].size() << ", " << N[6].size() << ", " << N[7].size() << ", " << endl;
+//    exit(0);
+    float delta1 = GWAMC(_mesh,diagBoundBox*0.003,0,v);
+    float delta2 = GWAMC(_mesh,diagBoundBox*0.006,1,v);
+    float delta3 = GWAMC(_mesh,diagBoundBox*0.009,2,v);
+    float delta4 = GWAMC(_mesh,diagBoundBox*0.012,3,v);
+    float delta5 = GWAMC(_mesh,diagBoundBox*0.015,4,v);
+    float delta6 = GWAMC(_mesh,diagBoundBox*0.018,5,v);
+    float delta7 = GWAMC(_mesh,diagBoundBox*0.024,6,v);
+    float delta8 = GWAMC(_mesh,diagBoundBox*0.030,7,v);
+//    cout << delta1 << ',' << delta2 << ',' << delta3 << ',' << delta4 << ',' << delta5 << ',' << delta6 << ',' << delta7 << ',' << delta8 << endl;
 //        if (delta1 != delta2)
 //            cout << delta1 << " " << delta2 << " saliency "<< endl;
-    _mesh->data(v).value = (abs(delta1-delta2)+abs(delta2-delta4)+abs(delta3-delta6)+abs(delta4-delta7)+abs(delta5-delta8)/*+abs(delta6-delta9)*/)/4;
-    N1.clear();
-    N2.clear();
-    N3.clear();
-    N4.clear();
-    N5.clear();
-    N6.clear();
-    N7.clear();
-    N8.clear();
-//    N9.clear();
+    float saliencyValue = (abs(delta1-delta2)+abs(delta2-delta4)+abs(delta3-delta6)+abs(delta4-delta7)+abs(delta5-delta8))/5;
+    _mesh->data(v).value = saliencyValue;
+    if(saliencyValue > maxSaliency) maxSaliency = saliencyValue;
+    else if(saliencyValue < minSaliency) minSaliency = saliencyValue;
+
+    for(int i=0; i<8; i++) N[i].clear();
+
 }
 
 void MainWindow::saliency(MyMesh* _mesh){
@@ -230,6 +230,7 @@ void MainWindow::saliency(MyMesh* _mesh){
         }
         i++;
     }
+
     ui->saliencyProgressBar->setValue(100);
 
 }
@@ -657,6 +658,7 @@ void MainWindow::on_pushButton_chargement_clicked()
     ui->pushButton_2->setEnabled(false);
     ui->pushButton_3->setEnabled(false);
     ui->pushButton_4->setEnabled(false);
+    ui->thresholdSpinBox->setEnabled(false);
 
     // fenêtre de sélection des fichiers
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
@@ -887,6 +889,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     vertexSelection = -1;
     edgeSelection = -1;
     faceSelection = -1;
+    liveDisplay = 0;
 
     modevoisinage = false;
 
@@ -896,6 +899,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->decimationProgressBar->setRange(0, 100);
 
     ui->checkBox->setEnabled(true);
+    ui->thresholdSpinBox->setEnabled(false);
     ui->pushButton_2->setEnabled(false);
     ui->pushButton_3->setEnabled(false);
     ui->pushButton_4->setEnabled(false);
@@ -927,6 +931,11 @@ void MainWindow::on_saliencyProgressBar_valueChanged(int value)
     {
         if(!liveDisplay) displayMesh(&mesh,true);
         ui->checkBox->setEnabled(true);
+        ui->thresholdSpinBox->setEnabled(true);
+        ui->thresholdSpinBox->setMaximum(maxSaliency);
+        ui->thresholdSpinBox->setMinimum(minSaliency);
+        const QString rangeLabelText = QString::fromStdString("Range = " + to_string(minSaliency) + " to " + to_string(maxSaliency));
+        ui->rangeLabel->setText(rangeLabelText);
         ui->pushButton_3->setEnabled(true);
     }
 }
@@ -939,8 +948,42 @@ void MainWindow::on_decimationComboBox_currentIndexChanged(int index)
 void MainWindow::on_pushButton_3_clicked()
 {
     ui->checkBox->setEnabled(false);
-    //decimate with decimateOptionIndex
-    //decimate(&mesh, percent);
+    float threshold = ui->thresholdSpinBox->value();
+    int lockedCount = 0;
+    for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); ++vit)
+    {
+        if(mesh.data(vit).value>=threshold)
+        {
+            mesh.status(vit).set_locked(true);
+            lockedCount++;
+        }
+    }
+    cout << "Locked " << lockedCount << " vertices before decimation" << endl;
+    Decimater::DecimaterT<MyMesh> decimator(mesh);
+
+    Decimater::ModAspectRatioT<MyMesh>::Handle MARhandler;
+    Decimater::ModEdgeLengthT<MyMesh>::Handle MELhandler;
+    Decimater::ModHausdorffT<MyMesh>::Handle MHhandler;
+    Decimater::ModIndependentSetsT<MyMesh>::Handle MIShandler;
+    Decimater::ModNormalDeviationT<MyMesh>::Handle MNDhandler;
+    Decimater::ModNormalFlippingT<MyMesh>::Handle MNFhandler;
+    Decimater::ModProgMeshT<MyMesh>::Handle MPMhandler;
+    Decimater::ModQuadricT<MyMesh>::Handle MQhandler;
+    Decimater::ModRoundnessT<MyMesh>::Handle MRhandler;
+
+    if(decimationOptionIndex == 0) decimator.add(MARhandler);
+    else if(decimationOptionIndex == 1) decimator.add(MELhandler);
+    else if(decimationOptionIndex == 2) decimator.add(MHhandler);
+    else if(decimationOptionIndex == 3) decimator.add(MIShandler);
+    else if(decimationOptionIndex == 4) decimator.add(MNDhandler);
+    else if(decimationOptionIndex == 5) decimator.add(MNFhandler);
+    else if(decimationOptionIndex == 6) decimator.add(MPMhandler);
+    else if(decimationOptionIndex == 7) { decimator.add(MQhandler); decimator.module(MQhandler).unset_max_err(); }
+    else if(decimationOptionIndex == 8) decimator.add(MRhandler);
+
+//    decimator.initialize();
+//    decimator.decimate();
+//    mesh.garbage_collection();
 }
 
 void MainWindow::on_decimationProgressBar_valueChanged(int value)

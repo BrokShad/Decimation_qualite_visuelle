@@ -132,6 +132,10 @@ initialize()
     Base::mesh().property(quadrics_, vh0) += q;
     Base::mesh().property(quadrics_, vh1) += q;
     Base::mesh().property(quadrics_, vh2) += q;
+
+    Base::mesh().property(quadrics_, vh0) *= Base::mesh().data(vh0).value;
+    Base::mesh().property(quadrics_, vh1) *= Base::mesh().data(vh1).value;
+    Base::mesh().property(quadrics_, vh2) *= Base::mesh().data(vh2).value;
   }
 }
 

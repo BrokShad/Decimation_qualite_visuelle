@@ -195,7 +195,7 @@ protected:
   /// returns false, if abort requested by observer
   bool notify_observer(size_t _n_collapses)
   {
-    if (observer() && _n_collapses % observer()->get_interval() == 0)
+    if (observer() /*&& _n_collapses % observer()->get_interval() == 0*/)
     {
       observer()->notify(_n_collapses);
       return !observer()->abort();

@@ -951,6 +951,8 @@ void MainWindow::on_decimationComboBox_currentIndexChanged(int index)
 void MainWindow::on_pushButton_3_clicked()
 {
     ui->checkBox->setEnabled(false);
+
+    ui->pushButton_4->setEnabled(true);
     float threshold = ui->thresholdSpinBox->value();
     int lockedCount = 0;
     Decimater::DecimaterT<MyMesh> decimator(mesh);
@@ -989,7 +991,7 @@ void MainWindow::on_pushButton_3_clicked()
 
     cout << "Locked " << lockedCount << " vertices before decimation" << endl;
     decimator.initialize();
-    decimator.decimate_to(1400);
+    decimator.decimate_to(mesh.n_vertices()*0.1);
     mesh.garbage_collection();
     displayMesh(&mesh);
 }
@@ -1010,7 +1012,12 @@ void MainWindow::on_decimationProgressBar_valueChanged(int value)
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    //sauvegarde
+    // fenêtre de sélection des fichiers
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
+
+    // chargement du fichier .obj dans la variable globale "mesh"
+    OpenMesh::IO::write_mesh(mesh, fileName.toUtf8().constData());
+
 }
 
 void MainWindow::on_checkBox_stateChanged(int arg1)

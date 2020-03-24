@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>840</width>
-    <height>539</height>
+    <width>950</width>
+    <height>593</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -116,36 +116,19 @@
         <widget class="QComboBox" name="decimationComboBox"/>
        </item>
        <item>
-        <widget class="QLabel" name="rangeLabel">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Range = WAITING FOR SALIENCY</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="label">
          <property name="font">
           <font>
            <italic>true</italic>
           </font>
          </property>
          <property name="text">
-          <string>Choose a threshold</string>
+          <string>Choose the decimation ratio</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="thresholdSpinBox">
-         <property name="decimals">
-          <number>10</number>
-         </property>
-        </widget>
+        <widget class="QDoubleSpinBox" name="decimationRatioSpinbox"/>
        </item>
        <item>
         <widget class="QLabel" name="label_7">
@@ -162,14 +145,7 @@
        <item>
         <widget class="QPushButton" name="pushButton_3">
          <property name="text">
-          <string>Decimate (NON FUNCTIONNAL)</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QProgressBar" name="decimationProgressBar">
-         <property name="value">
-          <number>0</number>
+          <string>Decimate</string>
          </property>
         </widget>
        </item>
@@ -225,7 +201,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>840</width>
+     <width>950</width>
      <height>22</height>
     </rect>
    </property>

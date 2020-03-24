@@ -15,6 +15,7 @@
 #include <OpenMesh/Tools/Decimater/ModProgMeshT.hh>
 #include <OpenMesh/Tools/Decimater/ModQuadricT.hh>
 #include <OpenMesh/Tools/Decimater/ModRoundnessT.hh>
+#include <OpenMesh/Tools/Decimater/ModQuadricSaliencyT.hh>
 #include <QProgressDialog>
 #include <cstdlib>
 #include <QVector>
@@ -131,13 +132,11 @@ private slots:
 
     void on_pushButton_3_clicked();
 
-    void on_decimationProgressBar_valueChanged(int value);
-
     void on_pushButton_4_clicked();
 
     void on_checkBox_stateChanged(int arg1);
 
-    void on_thresholdSpinBox_valueChanged(double arg1);
+    void on_decimationRatioSpinbox_valueChanged(double arg1);
 
 private:
 

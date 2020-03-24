@@ -22,7 +22,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_MainWindow_t {
     QByteArrayData data[13];
-    char stringdata0[275];
+    char stringdata0[276];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -40,10 +40,10 @@ QT_MOC_LITERAL(5, 105, 5), // "value"
 QT_MOC_LITERAL(6, 111, 41), // "on_decimationComboBox_current..."
 QT_MOC_LITERAL(7, 153, 5), // "index"
 QT_MOC_LITERAL(8, 159, 23), // "on_pushButton_3_clicked"
-QT_MOC_LITERAL(9, 183, 37), // "on_decimationProgressBar_valu..."
-QT_MOC_LITERAL(10, 221, 23), // "on_pushButton_4_clicked"
-QT_MOC_LITERAL(11, 245, 24), // "on_checkBox_stateChanged"
-QT_MOC_LITERAL(12, 270, 4) // "arg1"
+QT_MOC_LITERAL(9, 183, 23), // "on_pushButton_4_clicked"
+QT_MOC_LITERAL(10, 207, 24), // "on_checkBox_stateChanged"
+QT_MOC_LITERAL(11, 232, 4), // "arg1"
+QT_MOC_LITERAL(12, 237, 38) // "on_decimationRatioSpinbox_val..."
 
     },
     "MainWindow\0on_pushButton_chargement_clicked\0"
@@ -51,9 +51,9 @@ QT_MOC_LITERAL(12, 270, 4) // "arg1"
     "on_saliencyProgressBar_valueChanged\0"
     "value\0on_decimationComboBox_currentIndexChanged\0"
     "index\0on_pushButton_3_clicked\0"
-    "on_decimationProgressBar_valueChanged\0"
     "on_pushButton_4_clicked\0"
-    "on_checkBox_stateChanged\0arg1"
+    "on_checkBox_stateChanged\0arg1\0"
+    "on_decimationRatioSpinbox_valueChanged"
 };
 #undef QT_MOC_LITERAL
 
@@ -76,9 +76,9 @@ static const uint qt_meta_data_MainWindow[] = {
        4,    1,   56,    2, 0x08 /* Private */,
        6,    1,   59,    2, 0x08 /* Private */,
        8,    0,   62,    2, 0x08 /* Private */,
-       9,    1,   63,    2, 0x08 /* Private */,
-      10,    0,   66,    2, 0x08 /* Private */,
-      11,    1,   67,    2, 0x08 /* Private */,
+       9,    0,   63,    2, 0x08 /* Private */,
+      10,    1,   64,    2, 0x08 /* Private */,
+      12,    1,   67,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -86,9 +86,9 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void, QMetaType::Int,    5,
     QMetaType::Void, QMetaType::Int,    7,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,    5,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   12,
+    QMetaType::Void, QMetaType::Int,   11,
+    QMetaType::Void, QMetaType::Double,   11,
 
        0        // eod
 };
@@ -104,9 +104,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 2: _t->on_saliencyProgressBar_valueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 3: _t->on_decimationComboBox_currentIndexChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 4: _t->on_pushButton_3_clicked(); break;
-        case 5: _t->on_decimationProgressBar_valueChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 6: _t->on_pushButton_4_clicked(); break;
-        case 7: _t->on_checkBox_stateChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 5: _t->on_pushButton_4_clicked(); break;
+        case 6: _t->on_checkBox_stateChanged((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 7: _t->on_decimationRatioSpinbox_valueChanged((*reinterpret_cast< double(*)>(_a[1]))); break;
         default: ;
         }
     }

@@ -2,8 +2,6 @@
 #include "ui_mainwindow.h"
 #include <iostream>
 #include <linux/errno.h>
-//TP4
-/* **** début de la partie à compléter **** */
 
 using namespace std;
 
@@ -92,7 +90,6 @@ void MainWindow::rangeSearch(MyMesh *_mesh, int pid, float range)
         int cellNegYRange = 0;
         int cellNegZRange = 0;
 
-        //cout << pList.at(pid).x << endl << cellSizex << endl << range << endl;
         float Xrange = p[0]-Xmin-(cellSizex*pidCellX)+range;
         while(Xrange>cellSizex) {Xrange-=cellSizex; cellPosXRange++;}
         float Yrange = p[1]-Ymin-(cellSizey*pidCellY)+range;
@@ -125,19 +122,17 @@ void MainWindow::rangeSearch(MyMesh *_mesh, int pid, float range)
 //                    cout << "Looking into [" << x << "][" << y << "][" << z << "]" << endl;
                     for(it = cluster[x][y][z].begin(); it != cluster[x][y][z].end(); ++it)
                     {
-                        //cout << it->id << endl;
                         float distance = sqrt(pow(p[0]-(*it)[0],2)+pow(p[1]-(*it)[1],2)+pow(p[2]-(*it)[2],2));
-                        //cout << "Point " << it->id << " is at " << distance << " from " << pid << endl;
                         i=8;
-                        if(distance<=0.003) i = 0;
-                        else if(distance<=0.006) i = 1;
-                        else if(distance<=0.009) i = 2;
-                        else if(distance<=0.012) i = 3;
-                        else if(distance<=0.015) i = 4;
-                        else if(distance<=0.018) i = 5;
-                        else if(distance<=0.024) i = 6;
-                        else if(distance<=0.030) i = 7;
-                        N[i].push_back(*it);
+                        if(distance<=diagBoundBox*0.003) i = 0;
+                        else if(distance<=diagBoundBox*0.006) i = 1;
+                        else if(distance<=diagBoundBox*0.009) i = 2;
+                        else if(distance<=diagBoundBox*0.012) i = 3;
+                        else if(distance<=diagBoundBox*0.015) i = 4;
+                        else if(distance<=diagBoundBox*0.018) i = 5;
+                        else if(distance<=diagBoundBox*0.024) i = 6;
+                        else if(distance<=diagBoundBox*0.030) i = 7;
+                        if(i<8) N[i].push_back(*it);
                     }
                 }
 }
@@ -197,6 +192,7 @@ void MainWindow::vertexThreading(MyMesh* _mesh, VertexHandle v)
 //        if (delta1 != delta2)
 //            cout << delta1 << " " << delta2 << " saliency "<< endl;
     float saliencyValue = (abs(delta1-delta2)+abs(delta2-delta4)+abs(delta3-delta6)+abs(delta4-delta7)+abs(delta5-delta8))/5;
+    if(saliencyValue < 0) saliencyValue = 0;
     _mesh->data(v).value = saliencyValue;
     if(saliencyValue > maxSaliency) maxSaliency = saliencyValue;
     else if(saliencyValue < minSaliency) minSaliency = saliencyValue;
@@ -220,7 +216,7 @@ void MainWindow::saliency(MyMesh* _mesh){
             ui->saliencyProgressBar->setValue(progress);
         }
         if(i%1000 == 0) t1 = clock();
-            vertexThreading(&mesh, *vit);
+        vertexThreading(&mesh, *vit);
 //        tp.enqueue([&](MyMesh* m, VertexHandle v){vertexThreading(m, v);}, &mesh, *vit);
 //        async(launch::async, [&](MyMesh *m, VertexHandle v){return vertexThreading(m, v);}, &mesh, *vit);
         if(i%1000 == 999)
@@ -660,7 +656,6 @@ void MainWindow::on_pushButton_chargement_clicked()
     ui->pushButton_2->setEnabled(false);
     ui->pushButton_3->setEnabled(false);
     ui->pushButton_4->setEnabled(false);
-    ui->thresholdSpinBox->setEnabled(false);
 
     // fenêtre de sélection des fichiers
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
@@ -898,15 +893,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
 
     ui->saliencyProgressBar->setRange(0, 100);
-    ui->decimationProgressBar->setRange(0, 100);
+    ui->decimationRatioSpinbox->setRange(0, 100);
 
     ui->checkBox->setEnabled(true);
-    ui->thresholdSpinBox->setEnabled(false);
     ui->pushButton_2->setEnabled(false);
     ui->pushButton_3->setEnabled(false);
     ui->pushButton_4->setEnabled(false);
+    ui->decimationRatioSpinbox->setEnabled(false);
 
-    const QStringList optionList = {"Aspect Ratio","Edge Length","Hausdorff","Independant Sets","Normal Deviation","Normal Flipping","Prog Mesh","Quadric","Roundness"};
+    const QStringList optionList = {"Quadric Saliency","Quadric"};
     ui->decimationComboBox->addItems(optionList);
 
 }
@@ -933,91 +928,43 @@ void MainWindow::on_saliencyProgressBar_valueChanged(int value)
     {
         if(!liveDisplay) displayMesh(&mesh,true);
         ui->checkBox->setEnabled(true);
-        ui->thresholdSpinBox->setEnabled(true);
-        ui->thresholdSpinBox->setMaximum(maxSaliency);
-        ui->thresholdSpinBox->setMinimum(minSaliency);
-        const QString rangeLabelText = QString::fromStdString("Range = " + to_string(minSaliency) + " to " + to_string(maxSaliency));
-        ui->rangeLabel->setText(rangeLabelText);
         ui->pushButton_3->setEnabled(true);
+        ui->decimationRatioSpinbox->setEnabled(true);
     }
 }
 
 void MainWindow::on_decimationComboBox_currentIndexChanged(int index)
 {
     decimationOptionIndex = index;
-    cout << "test" << endl;
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    ui->checkBox->setEnabled(false);
-
-    ui->pushButton_4->setEnabled(true);
-    float threshold = ui->thresholdSpinBox->value();
     int lockedCount = 0;
     Decimater::DecimaterT<MyMesh> decimator(mesh);
 
-    Decimater::ModAspectRatioT<MyMesh>::Handle MARhandler;
-    Decimater::ModEdgeLengthT<MyMesh>::Handle MELhandler;
-    Decimater::ModHausdorffT<MyMesh>::Handle MHhandler;
-    Decimater::ModIndependentSetsT<MyMesh>::Handle MIShandler;
-    Decimater::ModNormalDeviationT<MyMesh>::Handle MNDhandler;
-    Decimater::ModNormalFlippingT<MyMesh>::Handle MNFhandler;
-    Decimater::ModProgMeshT<MyMesh>::Handle MPMhandler;
     Decimater::ModQuadricT<MyMesh>::Handle MQhandler;
-    Decimater::ModRoundnessT<MyMesh>::Handle MRhandler;
+    Decimater::ModQuadricSaliencyT<MyMesh>::Handle MQShandler;
 
-    if(decimationOptionIndex == 0) decimator.add(MARhandler);
-    else if(decimationOptionIndex == 1) decimator.add(MELhandler);
-    else if(decimationOptionIndex == 2) decimator.add(MHhandler);
-    else if(decimationOptionIndex == 3) decimator.add(MIShandler);
-    else if(decimationOptionIndex == 4) decimator.add(MNDhandler);
-    else if(decimationOptionIndex == 5) decimator.add(MNFhandler);
-    else if(decimationOptionIndex == 6) decimator.add(MPMhandler);
-    else if(decimationOptionIndex == 7) { decimator.add(MQhandler); decimator.module(MQhandler).unset_max_err(); }
-    else if(decimationOptionIndex == 8) decimator.add(MRhandler);
-
-    for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); ++vit)
-    {
-        if(mesh.data(*vit).value>=threshold || mesh.is_boundary(*vit))
-        {
-//            mesh.property(quadrics_, *vit) *= 10;
-//            mesh.status(*vit).set_locked(true);
-//            lockedCount++;
-        }
-        if(mesh.data(*vit).value < 0)
-            mesh.data(*vit).value = 0;
-    }
+    if(decimationOptionIndex == 0) { decimator.add(MQShandler); decimator.module(MQShandler).unset_max_err(); }
+    else if(decimationOptionIndex == 1) { decimator.add(MQhandler); decimator.module(MQhandler).unset_max_err(); }
 
     cout << "Locked " << lockedCount << " vertices before decimation" << endl;
     decimator.initialize();
-    decimator.decimate_to(mesh.n_vertices()*0.1);
+    decimator.decimate_to(mesh.n_vertices()*ui->decimationRatioSpinbox->value()/100);
     mesh.garbage_collection();
+    ui->pushButton_4->setEnabled(true);
     displayMesh(&mesh);
-}
-
-void MainWindow::on_decimationProgressBar_valueChanged(int value)
-{
-    if(value%2 == 0 && liveDisplay)
-    {
-        displayMesh(&mesh,true);
-    }
-    if(value == 100)
-    {
-        if(!liveDisplay) displayMesh(&mesh,true);
-        ui->checkBox->setEnabled(true);
-        ui->pushButton_4->setEnabled(true);
-    }
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
     // fenêtre de sélection des fichiers
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
+    //QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
+    QString fileName = QString::fromStdString("../output.obj");
 
     // chargement du fichier .obj dans la variable globale "mesh"
     OpenMesh::IO::write_mesh(mesh, fileName.toUtf8().constData());
-
 }
 
 void MainWindow::on_checkBox_stateChanged(int arg1)
@@ -1026,15 +973,7 @@ void MainWindow::on_checkBox_stateChanged(int arg1)
     cout << "Live display = " << arg1 << endl;
 }
 
-void MainWindow::on_thresholdSpinBox_valueChanged(double arg1)
+void MainWindow::on_decimationRatioSpinbox_valueChanged(double arg1)
 {
-    int lockedCount = 0;
-    for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); ++vit)
-    {
-        if(mesh.data(*vit).value>=arg1 || mesh.is_boundary(*vit))
-        {
-            lockedCount++;
-        }
-    }
-    cout << "Locked " << lockedCount << " vertices before decimation" << endl;
+
 }

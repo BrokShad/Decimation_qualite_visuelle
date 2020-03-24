@@ -46,12 +46,10 @@ public:
     QProgressBar *saliencyProgressBar;
     QLabel *label_6;
     QComboBox *decimationComboBox;
-    QLabel *rangeLabel;
-    QLabel *label_2;
-    QDoubleSpinBox *thresholdSpinBox;
+    QLabel *label;
+    QDoubleSpinBox *decimationRatioSpinbox;
     QLabel *label_7;
     QPushButton *pushButton_3;
-    QProgressBar *decimationProgressBar;
     QLabel *label_8;
     QPushButton *pushButton_4;
     QSpacerItem *verticalSpacer;
@@ -65,7 +63,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(840, 539);
+        MainWindow->resize(950, 593);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         horizontalLayout = new QHBoxLayout(centralWidget);
@@ -131,26 +129,16 @@ public:
 
         verticalLayout->addWidget(decimationComboBox);
 
-        rangeLabel = new QLabel(widget_2);
-        rangeLabel->setObjectName(QStringLiteral("rangeLabel"));
-        QFont font2;
-        font2.setBold(true);
-        font2.setWeight(75);
-        rangeLabel->setFont(font2);
+        label = new QLabel(widget_2);
+        label->setObjectName(QStringLiteral("label"));
+        label->setFont(font1);
 
-        verticalLayout->addWidget(rangeLabel);
+        verticalLayout->addWidget(label);
 
-        label_2 = new QLabel(widget_2);
-        label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setFont(font1);
+        decimationRatioSpinbox = new QDoubleSpinBox(widget_2);
+        decimationRatioSpinbox->setObjectName(QStringLiteral("decimationRatioSpinbox"));
 
-        verticalLayout->addWidget(label_2);
-
-        thresholdSpinBox = new QDoubleSpinBox(widget_2);
-        thresholdSpinBox->setObjectName(QStringLiteral("thresholdSpinBox"));
-        thresholdSpinBox->setDecimals(10);
-
-        verticalLayout->addWidget(thresholdSpinBox);
+        verticalLayout->addWidget(decimationRatioSpinbox);
 
         label_7 = new QLabel(widget_2);
         label_7->setObjectName(QStringLiteral("label_7"));
@@ -162,12 +150,6 @@ public:
         pushButton_3->setObjectName(QStringLiteral("pushButton_3"));
 
         verticalLayout->addWidget(pushButton_3);
-
-        decimationProgressBar = new QProgressBar(widget_2);
-        decimationProgressBar->setObjectName(QStringLiteral("decimationProgressBar"));
-        decimationProgressBar->setValue(0);
-
-        verticalLayout->addWidget(decimationProgressBar);
 
         label_8 = new QLabel(widget_2);
         label_8->setObjectName(QStringLiteral("label_8"));
@@ -200,7 +182,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 840, 22));
+        menuBar->setGeometry(QRect(0, 0, 950, 22));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -222,10 +204,9 @@ public:
         label_4->setText(QApplication::translate("MainWindow", "Launch the calculation", Q_NULLPTR));
         pushButton_2->setText(QApplication::translate("MainWindow", "Saliency", Q_NULLPTR));
         label_6->setText(QApplication::translate("MainWindow", "Choose a decimation method", Q_NULLPTR));
-        rangeLabel->setText(QApplication::translate("MainWindow", "Range = WAITING FOR SALIENCY", Q_NULLPTR));
-        label_2->setText(QApplication::translate("MainWindow", "Choose a threshold", Q_NULLPTR));
+        label->setText(QApplication::translate("MainWindow", "Choose the decimation ratio", Q_NULLPTR));
         label_7->setText(QApplication::translate("MainWindow", "Launch decimation", Q_NULLPTR));
-        pushButton_3->setText(QApplication::translate("MainWindow", "Decimate (NON FUNCTIONNAL)", Q_NULLPTR));
+        pushButton_3->setText(QApplication::translate("MainWindow", "Decimate", Q_NULLPTR));
         label_8->setText(QApplication::translate("MainWindow", "Save the result.", Q_NULLPTR));
         pushButton_4->setText(QApplication::translate("MainWindow", "Export (NON FUNCTIONNAL)", Q_NULLPTR));
         checkBox->setText(QApplication::translate("MainWindow", "Live Display (Can slow the process)", Q_NULLPTR));

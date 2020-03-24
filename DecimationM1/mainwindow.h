@@ -32,6 +32,7 @@
 #include <time.h>
 #include <cmath>
 
+//#define TAB_SIZE 70
 #include "threadpool.h"
 
 namespace Ui {
@@ -85,7 +86,7 @@ class MainWindow : public QMainWindow
 public:
 
     explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    virtual ~MainWindow();
 
     // les fonctions à compléter
     void showEdgeSelection(MyMesh* _mesh);

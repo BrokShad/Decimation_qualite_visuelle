@@ -220,12 +220,13 @@ void MainWindow::saliency(MyMesh* _mesh){
             ui->saliencyProgressBar->setValue(progress);
         }
         if(i%1000 == 0) t1 = clock();
+            vertexThreading(&mesh, *vit);
 //        tp.enqueue([&](MyMesh* m, VertexHandle v){vertexThreading(m, v);}, &mesh, *vit);
 //        async(launch::async, [&](MyMesh *m, VertexHandle v){return vertexThreading(m, v);}, &mesh, *vit);
-        vertexThreading(&mesh, *vit);
         if(i%1000 == 999)
         {
             t2 = clock();
+
             cout << i << "/" << mesh.n_vertices() << " (" << static_cast<double>(t2-t1)/static_cast<double>(CLOCKS_PER_SEC) << "s since last update)" << endl;
         }
         i++;
@@ -356,8 +357,9 @@ float MainWindow::faceArea(MyMesh* _mesh, int faceID)
         VertexHandle vertex_h = *curVer;
         points.push_back(_mesh->point(vertex_h));
     }
-
-    return norm((points[1] - points[0]) % (points[2] - points[0])) / 2;
+    float area = norm((points[1] - points[0]) % (points[2] - points[0])) / 2;
+    points.clear();
+    return area;
 }
 
 

@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
+<<<<<<< HEAD
 <!-- Written by QtCreator 4.5.2, 2020-03-22T17:01:42. -->
+=======
+<<<<<<< HEAD
+<!-- Written by QtCreator 4.5.2, 2020-03-22T16:38:46. -->
+=======
+<!-- Written by QtCreator 4.5.2, 2020-03-22T08:33:48. -->
+>>>>>>> 3c9a3ec2bc6280ab5930c90fd8a1f6eb935e30b6
+>>>>>>> 74096c0eb3d11f708dcf535f97673b69d0561b62
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -303,14 +311,23 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">starterLight</value>
+<<<<<<< HEAD
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">starterLight2</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/brok/Bureau/Decimation/Decimation_qualite_visuelle/DecimationM1/starterLight.pro</value>
+=======
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/brok/Bureau/Decimation/Decimation_qualite_visuelle/DecimationM1/Decimation_qualite_visuelle/DecimationM1/starterLight.pro</value>
+>>>>>>> 74096c0eb3d11f708dcf535f97673b69d0561b62
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">starterLight.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory"></value>
+<<<<<<< HEAD
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory.default"></value>
+=======
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory.default">/home/brok/Bureau/PGAII/PGAI/Debernardi_Gueguen/build-starterLight-Desktop-Debug</value>
+>>>>>>> 74096c0eb3d11f708dcf535f97673b69d0561b62
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>

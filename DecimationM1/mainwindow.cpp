@@ -943,6 +943,7 @@ void MainWindow::on_saliencyProgressBar_valueChanged(int value)
 void MainWindow::on_decimationComboBox_currentIndexChanged(int index)
 {
     decimationOptionIndex = index;
+    cout << "test" << endl;
 }
 
 void MainWindow::on_pushButton_3_clicked()
@@ -950,15 +951,6 @@ void MainWindow::on_pushButton_3_clicked()
     ui->checkBox->setEnabled(false);
     float threshold = ui->thresholdSpinBox->value();
     int lockedCount = 0;
-    for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); ++vit)
-    {
-        if(mesh.data(vit).value>=threshold)
-        {
-            mesh.status(vit).set_locked(true);
-            lockedCount++;
-        }
-    }
-    cout << "Locked " << lockedCount << " vertices before decimation" << endl;
     Decimater::DecimaterT<MyMesh> decimator(mesh);
 
     Decimater::ModAspectRatioT<MyMesh>::Handle MARhandler;
@@ -981,9 +973,23 @@ void MainWindow::on_pushButton_3_clicked()
     else if(decimationOptionIndex == 7) { decimator.add(MQhandler); decimator.module(MQhandler).unset_max_err(); }
     else if(decimationOptionIndex == 8) decimator.add(MRhandler);
 
-//    decimator.initialize();
-//    decimator.decimate();
-//    mesh.garbage_collection();
+    for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); ++vit)
+    {
+        if(mesh.data(*vit).value>=threshold || mesh.is_boundary(*vit))
+        {
+//            mesh.property(quadrics_, *vit) *= 10;
+//            mesh.status(*vit).set_locked(true);
+//            lockedCount++;
+        }
+        if(mesh.data(*vit).value < 0)
+            mesh.data(*vit).value = 0;
+    }
+
+    cout << "Locked " << lockedCount << " vertices before decimation" << endl;
+    decimator.initialize();
+    decimator.decimate_to(1400);
+    mesh.garbage_collection();
+    displayMesh(&mesh);
 }
 
 void MainWindow::on_decimationProgressBar_valueChanged(int value)
@@ -1009,4 +1015,17 @@ void MainWindow::on_checkBox_stateChanged(int arg1)
 {
     liveDisplay = arg1;
     cout << "Live display = " << arg1 << endl;
+}
+
+void MainWindow::on_thresholdSpinBox_valueChanged(double arg1)
+{
+    int lockedCount = 0;
+    for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); ++vit)
+    {
+        if(mesh.data(*vit).value>=arg1 || mesh.is_boundary(*vit))
+        {
+            lockedCount++;
+        }
+    }
+    cout << "Locked " << lockedCount << " vertices before decimation" << endl;
 }

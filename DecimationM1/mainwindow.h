@@ -136,6 +136,8 @@ private slots:
 
     void on_checkBox_stateChanged(int arg1);
 
+    void on_thresholdSpinBox_valueChanged(double arg1);
+
 private:
 
     struct Point

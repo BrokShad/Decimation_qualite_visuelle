@@ -44,6 +44,8 @@ public:
     QLabel *label_4;
     QPushButton *pushButton_2;
     QProgressBar *saliencyProgressBar;
+    QLabel *label_2;
+    QPushButton *pushButton;
     QLabel *label_6;
     QComboBox *decimationComboBox;
     QLabel *label;
@@ -54,6 +56,7 @@ public:
     QPushButton *pushButton_4;
     QSpacerItem *verticalSpacer;
     QCheckBox *checkBox;
+    QCheckBox *checkBox_2;
     MeshViewerWidget *displayWidget;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
@@ -63,7 +66,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(950, 593);
+        MainWindow->resize(1020, 642);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         horizontalLayout = new QHBoxLayout(centralWidget);
@@ -118,6 +121,17 @@ public:
 
         verticalLayout->addWidget(saliencyProgressBar);
 
+        label_2 = new QLabel(widget_2);
+        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setFont(font1);
+
+        verticalLayout->addWidget(label_2);
+
+        pushButton = new QPushButton(widget_2);
+        pushButton->setObjectName(QStringLiteral("pushButton"));
+
+        verticalLayout->addWidget(pushButton);
+
         label_6 = new QLabel(widget_2);
         label_6->setObjectName(QStringLiteral("label_6"));
         label_6->setFont(font1);
@@ -171,6 +185,11 @@ public:
 
         verticalLayout->addWidget(checkBox);
 
+        checkBox_2 = new QCheckBox(widget_2);
+        checkBox_2->setObjectName(QStringLiteral("checkBox_2"));
+
+        verticalLayout->addWidget(checkBox_2);
+
 
         horizontalLayout->addWidget(widget_2);
 
@@ -182,7 +201,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 950, 22));
+        menuBar->setGeometry(QRect(0, 0, 1020, 22));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -201,15 +220,18 @@ public:
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", Q_NULLPTR));
         label_3->setText(QApplication::translate("MainWindow", "Load a mesh", Q_NULLPTR));
         pushButton_chargement->setText(QApplication::translate("MainWindow", "Load Mesh", Q_NULLPTR));
-        label_4->setText(QApplication::translate("MainWindow", "Launch the calculation", Q_NULLPTR));
+        label_4->setText(QApplication::translate("MainWindow", "Launch the calculation or load an existing heatfile", Q_NULLPTR));
         pushButton_2->setText(QApplication::translate("MainWindow", "Saliency", Q_NULLPTR));
+        label_2->setText(QApplication::translate("MainWindow", "(Optional) Save the heatmap", Q_NULLPTR));
+        pushButton->setText(QApplication::translate("MainWindow", "Export heatmap", Q_NULLPTR));
         label_6->setText(QApplication::translate("MainWindow", "Choose a decimation method", Q_NULLPTR));
-        label->setText(QApplication::translate("MainWindow", "Choose the decimation ratio", Q_NULLPTR));
+        label->setText(QApplication::translate("MainWindow", "Choose the decimation ratio ( 0 - 100 )", Q_NULLPTR));
         label_7->setText(QApplication::translate("MainWindow", "Launch decimation", Q_NULLPTR));
         pushButton_3->setText(QApplication::translate("MainWindow", "Decimate", Q_NULLPTR));
-        label_8->setText(QApplication::translate("MainWindow", "Save the result.", Q_NULLPTR));
-        pushButton_4->setText(QApplication::translate("MainWindow", "Export (NON FUNCTIONNAL)", Q_NULLPTR));
-        checkBox->setText(QApplication::translate("MainWindow", "Live Display (Can slow the process)", Q_NULLPTR));
+        label_8->setText(QApplication::translate("MainWindow", "Save the result. (output.obj)", Q_NULLPTR));
+        pushButton_4->setText(QApplication::translate("MainWindow", "Export", Q_NULLPTR));
+        checkBox->setText(QApplication::translate("MainWindow", "Live Saliency (Can slow the process)", Q_NULLPTR));
+        checkBox_2->setText(QApplication::translate("MainWindow", "Heatmap on Decimate", Q_NULLPTR));
     } // retranslateUi
 
 };

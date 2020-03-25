@@ -656,9 +656,10 @@ void MainWindow::on_pushButton_chargement_clicked()
     ui->pushButton_2->setEnabled(false);
     ui->pushButton_3->setEnabled(false);
     ui->pushButton_4->setEnabled(false);
+    ui->pushButton->setEnabled(false);
 
     // fenêtre de sélection des fichiers
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
+    fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
 
     // chargement du fichier .obj dans la variable globale "mesh"
     OpenMesh::IO::read_mesh(mesh, fileName.toUtf8().constData());
@@ -886,7 +887,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     vertexSelection = -1;
     edgeSelection = -1;
     faceSelection = -1;
-    liveDisplay = 0;
+    liveDisplay = false;
+    decimationHeatmap = false;
 
     modevoisinage = false;
 
@@ -915,7 +917,27 @@ void MainWindow::on_pushButton_2_clicked()
 {
     ui->checkBox->setEnabled(false);
     ui->saliencyProgressBar->setValue(0);
-    QtConcurrent::run([&](MyMesh* _mesh){saliency(&mesh);}, &mesh);
+    QFile heatfile(fileName + QString::fromStdString(".heat"));
+    QStringList heatlist;
+    if(heatfile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        cout << "Heatfile found, using it instead of recalculating" << endl;
+        QTextStream in(&heatfile);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+            QRegExp rx("[,]");
+            heatlist = line.split(rx, QString::SkipEmptyParts);
+        }
+        MyMesh::VertexIter vit = mesh.vertices_begin();
+        for(int i = 0; i < heatlist.size(); i++)
+        {
+            mesh.data(*vit).value = heatlist.at(i).toFloat();
+            ++vit;
+        }
+        ui->saliencyProgressBar->setValue(100);
+    }
+    else QtConcurrent::run([&](MyMesh* _mesh){saliency(&mesh);}, &mesh);
 }
 
 void MainWindow::on_saliencyProgressBar_valueChanged(int value)
@@ -929,6 +951,7 @@ void MainWindow::on_saliencyProgressBar_valueChanged(int value)
         if(!liveDisplay) displayMesh(&mesh,true);
         ui->checkBox->setEnabled(true);
         ui->pushButton_3->setEnabled(true);
+        ui->pushButton->setEnabled(true);
         ui->decimationRatioSpinbox->setEnabled(true);
     }
 }
@@ -940,8 +963,10 @@ void MainWindow::on_decimationComboBox_currentIndexChanged(int index)
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    int lockedCount = 0;
-    Decimater::DecimaterT<MyMesh> decimator(mesh);
+    mesh2 = mesh;
+    mesh2.update_normals();
+    resetAllColorsAndThickness(&mesh2);
+    Decimater::DecimaterT<MyMesh> decimator(mesh2);
 
     Decimater::ModQuadricT<MyMesh>::Handle MQhandler;
     Decimater::ModQuadricSaliencyT<MyMesh>::Handle MQShandler;
@@ -949,22 +974,21 @@ void MainWindow::on_pushButton_3_clicked()
     if(decimationOptionIndex == 0) { decimator.add(MQShandler); decimator.module(MQShandler).unset_max_err(); }
     else if(decimationOptionIndex == 1) { decimator.add(MQhandler); decimator.module(MQhandler).unset_max_err(); }
 
-    cout << "Locked " << lockedCount << " vertices before decimation" << endl;
     decimator.initialize();
-    decimator.decimate_to(mesh.n_vertices()*ui->decimationRatioSpinbox->value()/100);
-    mesh.garbage_collection();
+    decimator.decimate_to(mesh2.n_vertices()*ui->decimationRatioSpinbox->value()/100);
+    mesh2.garbage_collection();
     ui->pushButton_4->setEnabled(true);
-    displayMesh(&mesh);
+    displayMesh(&mesh2,decimationHeatmap);
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
     // fenêtre de sélection des fichiers
     //QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
-    QString fileName = QString::fromStdString("../output.obj");
+    QString savefile = QString::fromStdString("_QS_"+to_string(ui->decimationRatioSpinbox->value())+".obj");
 
     // chargement du fichier .obj dans la variable globale "mesh"
-    OpenMesh::IO::write_mesh(mesh, fileName.toUtf8().constData());
+    OpenMesh::IO::write_mesh(mesh2, savefile.toUtf8().constData());
 }
 
 void MainWindow::on_checkBox_stateChanged(int arg1)
@@ -976,4 +1000,23 @@ void MainWindow::on_checkBox_stateChanged(int arg1)
 void MainWindow::on_decimationRatioSpinbox_valueChanged(double arg1)
 {
 
+}
+
+void MainWindow::on_checkBox_2_stateChanged(int arg1)
+{
+    decimationHeatmap = arg1;
+    cout << "DHM = " << arg1 << endl;
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    //Export the heatmap
+    QFile file(fileName + QString::fromStdString(".heat"));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+    for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); vit++)
+        out << mesh.data(*vit).value << ",";
+    cout << "Successfully exported the heatmap to: " << fileName.toStdString()+".heat" << endl;
 }

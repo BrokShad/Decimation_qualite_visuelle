@@ -138,6 +138,10 @@ private slots:
 
     void on_decimationRatioSpinbox_valueChanged(double arg1);
 
+    void on_checkBox_2_stateChanged(int arg1);
+
+    void on_pushButton_clicked();
+
 private:
 
     struct Point
@@ -172,8 +176,12 @@ private:
     bool modevoisinage;
 
     bool liveDisplay;
+    bool decimationHeatmap;
+
+    QString fileName;
 
     MyMesh mesh;
+    MyMesh mesh2;
     int vertexSelection;
     int edgeSelection;
     int faceSelection;

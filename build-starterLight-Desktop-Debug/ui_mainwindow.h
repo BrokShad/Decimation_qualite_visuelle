@@ -228,7 +228,7 @@ public:
         label->setText(QApplication::translate("MainWindow", "Choose the decimation ratio ( 0 - 100 )", Q_NULLPTR));
         label_7->setText(QApplication::translate("MainWindow", "Launch decimation", Q_NULLPTR));
         pushButton_3->setText(QApplication::translate("MainWindow", "Decimate", Q_NULLPTR));
-        label_8->setText(QApplication::translate("MainWindow", "Save the result. (output.obj)", Q_NULLPTR));
+        label_8->setText(QApplication::translate("MainWindow", "Save the result", Q_NULLPTR));
         pushButton_4->setText(QApplication::translate("MainWindow", "Export", Q_NULLPTR));
         checkBox->setText(QApplication::translate("MainWindow", "Live Saliency (Can slow the process)", Q_NULLPTR));
         checkBox_2->setText(QApplication::translate("MainWindow", "Heatmap on Decimate", Q_NULLPTR));

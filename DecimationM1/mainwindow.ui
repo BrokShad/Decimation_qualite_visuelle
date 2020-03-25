@@ -176,7 +176,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Save the result. (output.obj)</string>
+          <string>Save the result</string>
          </property>
         </widget>
        </item>

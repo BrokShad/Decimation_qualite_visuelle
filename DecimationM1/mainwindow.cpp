@@ -657,13 +657,14 @@ void MainWindow::on_pushButton_chargement_clicked()
     ui->pushButton_3->setEnabled(false);
     ui->pushButton_4->setEnabled(false);
     ui->pushButton->setEnabled(false);
+    ui->saliencyProgressBar->setValue(0);
 
     // fenêtre de sélection des fichiers
     fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
 
     // chargement du fichier .obj dans la variable globale "mesh"
     OpenMesh::IO::read_mesh(mesh, fileName.toUtf8().constData());
-
+    fileName.chop(4);
     mesh.update_normals();
 
     // initialisation des couleurs et épaisseurs (sommets et arêtes) du mesh
@@ -985,7 +986,7 @@ void MainWindow::on_pushButton_4_clicked()
 {
     // fenêtre de sélection des fichiers
     //QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "", tr("Mesh Files (*.obj)"));
-    QString savefile = QString::fromStdString("_QS_"+to_string(ui->decimationRatioSpinbox->value())+".obj");
+    QString savefile = QString::fromStdString(fileName.toStdString()+"_QS_"+to_string(ui->decimationRatioSpinbox->value())+".obj");
 
     // chargement du fichier .obj dans la variable globale "mesh"
     OpenMesh::IO::write_mesh(mesh2, savefile.toUtf8().constData());

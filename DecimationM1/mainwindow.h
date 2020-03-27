@@ -20,8 +20,6 @@
 #include <cstdlib>
 #include <QVector>
 #include <QtConcurrent/QtConcurrent>
-#include <QFutureWatcher>
-#include <QFuture>
 #include <math.h>
 
 #include <stdlib.h>
@@ -34,7 +32,6 @@
 #include <cmath>
 
 //#define TAB_SIZE 70
-#include "threadpool.h"
 
 namespace Ui {
 class MainWindow;
@@ -89,26 +86,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     virtual ~MainWindow();
 
-    // les fonctions à compléter
-    void showEdgeSelection(MyMesh* _mesh);
-    int collapseEdge(MyMesh* _mesh, int edgeID);
-    void decimation(MyMesh* _mesh, int percent);
-    void updateEdgeSelectionIHM();
-    int smallestEdge(MyMesh* _mesh);
     void displayMesh(MyMesh *_mesh, bool isTemperatureMap = false, float mapRange = -1);
     void resetAllColorsAndThickness(MyMesh* _mesh);
 
     float faceArea(MyMesh* _mesh, int faceID);
-    int getSmallestAngle(MyMesh *_mesh);
-    int getSmallestPlan(MyMesh *_mesh);
-    int getSmallestRatio(MyMesh *_mesh);
-    int getSmallestSaliency(MyMesh *_mesh);
-    float getAngleFF(MyMesh *_mesh, int faceID0, int faceID1);
-    int getSmallestEdge(MyMesh *_mesh);
-    int getSmallestEdgeFace(MyMesh *_mesh);
 
     float barycentricArea(MyMesh *_mesh, int vertexID);
-    float angleEE(MyMesh *_mesh, int vertexID, int faceID);
     float angleFF(MyMesh *_mesh, int faceID0, int faceID1, int vertID0, int vertID1);
     float calculateCurveOnVertex(MyMesh *_mesh, int vertexID);
     void H_Curv(MyMesh *_mesh);
@@ -135,8 +118,6 @@ private slots:
     void on_pushButton_4_clicked();
 
     void on_checkBox_stateChanged(int arg1);
-
-    void on_decimationRatioSpinbox_valueChanged(double arg1);
 
     void on_checkBox_2_stateChanged(int arg1);
 

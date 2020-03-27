@@ -46,9 +46,6 @@ SOURCES += \
 HEADERS += \
         mainwindow.h \
     meshviewerwidget.h \
-    ../../Desktop/Range search/ThreadPool.h \
-    ../../Desktop/Range search/ThreadPool.h \
-    threadpool.h
 
 FORMS += \
         mainwindow.ui
